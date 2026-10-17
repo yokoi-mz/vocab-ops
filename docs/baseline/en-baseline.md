@@ -1,12 +1,12 @@
 # 英語のベースライン
 
-作成日：2026-10-17
+作成日：2026-10-17　更新：2026-10-18
 
-英語の手札語彙の最初の 150 語と、英語のノーカン語彙 75 語。
+英語の手札語彙 131 語と、ノーカン語彙 77 語。
 
-## 手札語彙（150）
+## 手札語彙（131）
 
-### 間投詞・定型（あいさつ・応答）（7）
+### 間投詞・定型（あいさつ・応答）（5）
 
 | 語 | 意味 |
 |---|---|
@@ -15,10 +15,8 @@
 | please | お願い |
 | sorry | ごめん |
 | excuse me | すみません |
-| yes | うん・はい |
-| no | いいえ |
 
-### 動詞（48）
+### 動詞（37）
 
 | 語 | 意味 |
 |---|---|
@@ -33,7 +31,6 @@
 | want | ほしい |
 | remember | 覚えてる |
 | forget | 忘れる |
-| mean | 意味する |
 | go | 行く |
 | come | 来る |
 | make | 作る |
@@ -43,35 +40,25 @@
 | take | 取る・持っていく |
 | give | あげる |
 | help | 助ける |
-| wait | 待つ |
 | stop | 止まる |
 | use | 使う |
-| try | やってみる |
 | start | 始める |
-| put | 置く |
 | say | 言う |
+| speak | 話す |
 | call | 呼ぶ・電話 |
-| show | 見せる |
 | learn | 学ぶ |
 | buy | 買う |
-| pay | 払う |
 | like | 好き |
 | love | 大好き |
-| play | 遊ぶ・演奏 |
-| win | 勝つ |
-| clean | 掃除する |
-| cut | 切る |
 | read | 読む |
 | write | 書く |
 | open | 開ける |
 | close | 閉める |
 | change | 変える |
-| wear | 着る |
-| leave | 出る・去る |
-| stay | 泊まる・いる |
 | worry | 心配する |
+| work | 働く |
 
-### 形容詞（33）
+### 形容詞（32）
 
 | 語 | 意味 |
 |---|---|
@@ -89,7 +76,6 @@
 | same | 同じ |
 | happy | 嬉しい |
 | sad | 悲しい |
-| angry | 怒ってる |
 | tired | 疲れた |
 | scary | 怖い |
 | sick | 具合悪い |
@@ -109,7 +95,7 @@
 | near | 近い |
 | far | 遠い |
 
-### 副詞・数量・その他（35）
+### 副詞・数量・その他（29）
 
 | 語 | 意味 |
 |---|---|
@@ -127,29 +113,23 @@
 | too | 〜すぎ・も |
 | now | 今 |
 | later | あとで |
-| soon | すぐ |
 | first | まず・最初 |
 | next | 次 |
-| again | また |
 | before | 前 |
 | after | あと |
 | today | 今日 |
 | tomorrow | 明日 |
-| yesterday | 昨日 |
 | early | 早い |
 | late | 遅い(時刻) |
 | already | もう・すでに |
 | always | いつも |
 | never | 絶対〜ない |
 | sometimes | 時々 |
-| still | まだ |
-| here | ここ |
-| there | そこ |
 | together | 一緒に |
 | up | 上へ |
 | down | 下へ |
 
-### 名詞（27）
+### 名詞（28）
 
 | 語 | 意味 |
 |---|---|
@@ -158,6 +138,7 @@
 | food | 食べ物 |
 | day | 日 |
 | night | 夜 |
+| year | 年 |
 | morning | 朝 |
 | time | 時間 |
 | shop | 店 |
@@ -169,7 +150,6 @@
 | place | 場所 |
 | problem | 問題 |
 | month | 月（期間） |
-| sound | 音 |
 | word | 言葉・単語 |
 | way | 方法・道 |
 | kind | 種類 |
@@ -180,8 +160,9 @@
 | home | 家・帰る場所 |
 | picture | 写真・絵 |
 | weather | 天気 |
+| sport | スポーツ |
 
-## ノーカン語彙（75）
+## ノーカン語彙（77）
 
 手札語彙制限に数えない、文の骨組みの語。
 
@@ -197,5 +178,5 @@
 | 疑問詞 | what, where, when, why, who, how, which | 7 |
 | 接続詞 | and, but, or, because, if, than, as | 7 |
 | 前置詞 | from, to, for, with, about, in, on, at, of, by | 10 |
-| be 動詞・否定 | be, not | 2 |
+| be 動詞・否定・応答 | be, not, yes, no | 4 |
 | 助動詞・基本動詞 | have, do, can, will, could, would, should, must, may, might | 10 |

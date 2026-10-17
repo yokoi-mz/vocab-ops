@@ -102,6 +102,8 @@
 | フォルダ・ファイル | kebab-case | `active-vocab/` |
 | DB の表・列 | snake_case | `active_vocab` |
 
+言語は ISO 639-1 の小文字2文字のコードで表す（`en`・`fr`・`it`・`es`・`de`・`sv`）。ファイル名（`docs/baseline/en-baseline.md` など）・コード・DB で同じコードを使う。
+
 ## 関連文書
 
 - `legacy-handover.md`：旧版から引き継ぐ知識と、決定・未決の一覧
