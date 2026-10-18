@@ -2,7 +2,8 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
-const databasePath = path.join(process.cwd(), "data", "vocab.db");
+// 環境変数 VOCAB_OPS_DATABASE_PATH があれば、そのファイルを使う（本物の DB を汚さずに試すときなど）
+const databasePath = process.env.VOCAB_OPS_DATABASE_PATH ?? path.join(process.cwd(), "data", "vocab.db");
 
 export function openDatabase(): DatabaseSync {
   mkdirSync(path.dirname(databasePath), { recursive: true });

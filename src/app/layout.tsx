@@ -19,6 +19,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Link href="/" className={styles.appName}>
             vocab-ops
           </Link>
+          <nav className={styles.nav}>
+            <Link href="/generate">文生成</Link>
+            <Link href="/">語彙</Link>
+          </nav>
         </header>
         <div className={styles.content}>{children}</div>
       </body>

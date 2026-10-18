@@ -2,13 +2,21 @@ import type { DatabaseSync } from "node:sqlite";
 import { z } from "zod";
 
 const languageRowSchema = z.object({
+  vocab_size_mode: z.enum(["increase", "keep", "decrease"]),
+  expanded_outside_word_limit: z.number(),
   active_vocab_version: z.number(),
   last_generation_seq: z.number(),
+  last_vocab_update_seq: z.number(),
 });
 
+export type VocabSizeMode = "increase" | "keep" | "decrease";
+
 export type LanguageState = {
+  vocabSizeMode: VocabSizeMode;
+  expandedOutsideWordLimit: number;
   activeVocabVersion: number;
   lastGenerationSeq: number;
+  lastVocabUpdateSeq: number;
 };
 
 export function insertLanguageIfMissing(db: DatabaseSync, language: string): void {
@@ -17,12 +25,25 @@ export function insertLanguageIfMissing(db: DatabaseSync, language: string): voi
 
 export function getLanguageState(db: DatabaseSync, language: string): LanguageState {
   const row = languageRowSchema.parse(
-    db.prepare("SELECT active_vocab_version, last_generation_seq FROM languages WHERE code = ?").get(language),
+    db.prepare(`
+      SELECT vocab_size_mode, expanded_outside_word_limit, active_vocab_version, last_generation_seq, last_vocab_update_seq
+      FROM languages WHERE code = ?
+    `).get(language),
   );
   return {
+    vocabSizeMode: row.vocab_size_mode,
+    expandedOutsideWordLimit: row.expanded_outside_word_limit,
     activeVocabVersion: row.active_vocab_version,
     lastGenerationSeq: row.last_generation_seq,
+    lastVocabUpdateSeq: row.last_vocab_update_seq,
   };
+}
+
+export function advanceGenerationSeq(db: DatabaseSync, language: string): number {
+  const row = z.object({ last_generation_seq: z.number() }).parse(
+    db.prepare("UPDATE languages SET last_generation_seq = last_generation_seq + 1 WHERE code = ? RETURNING last_generation_seq").get(language),
+  );
+  return row.last_generation_seq;
 }
 
 export function setActiveVocabVersion(db: DatabaseSync, language: string, version: number): void {
@@ -126,4 +147,23 @@ export function listWordsByStatus(db: DatabaseSync, language: string, vocabStatu
       partOfSpeech: word.part_of_speech,
     };
   });
+}
+
+// 手札外語彙の語を登録する。すでに手札外語彙の語として登録されていれば、意味と品詞を最新の値に書き換える。
+// どちらの場合も、語の番号を返す。
+export function saveOutsideWord(
+  db: DatabaseSync,
+  word: { language: string; lemma: string; lemmaKey: string; meaning: string | null; partOfSpeech: string | null },
+): number {
+  db.prepare(`
+    INSERT INTO words (language, lemma, lemma_key, meaning, part_of_speech, vocab_status)
+    VALUES (:language, :lemma, :lemmaKey, :meaning, :partOfSpeech, 'outside')
+    ON CONFLICT (language, lemma_key) DO UPDATE SET
+      meaning = excluded.meaning,
+      part_of_speech = excluded.part_of_speech
+    WHERE vocab_status = 'outside'
+  `).run(word);
+  return insertedIdSchema.parse(
+    db.prepare("SELECT id FROM words WHERE language = ? AND lemma_key = ?").get(word.language, word.lemmaKey),
+  ).id;
 }

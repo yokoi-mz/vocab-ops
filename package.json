@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start -H 127.0.0.1",
     "lint": "eslint",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "worker": "tsx --env-file-if-exists=.env.local src/worker/index.ts",
     "import-baseline": "tsx src/cli/import-baseline.ts"
   },
   "dependencies": {

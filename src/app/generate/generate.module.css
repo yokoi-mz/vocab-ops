@@ -1,0 +1,165 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+fieldset.field {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.label {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.form input:not([type="radio"]),
+.form select,
+.form textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-background);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.submitButton {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: var(--color-surface);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.card {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.cardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.sentence {
+  margin: 12px 0;
+  font-size: 1.25rem;
+  line-height: 1.7;
+}
+
+.outsideWord {
+  color: #d1495b;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.speakButton,
+.wordButton {
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.speakButton {
+  margin-left: 8px;
+  font-size: 1rem;
+}
+
+.wordButton {
+  padding: 0;
+  font-weight: 600;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  margin: 0 0 12px;
+}
+
+.details dt {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.details dd {
+  margin: 0;
+}
+
+.tokenTable {
+  width: 100%;
+  margin-top: 8px;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.tokenTable td {
+  padding: 4px 8px 4px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.muted {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.warning {
+  margin: 0;
+  color: #d1495b;
+  font-size: 0.875rem;
+}
+
+.outsideLabel {
+  color: #d1495b;
+  font-size: 0.875rem;
+}
