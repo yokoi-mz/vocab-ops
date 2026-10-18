@@ -7,6 +7,7 @@ import {
   getLanguageState,
   insertActiveVocabChange,
   insertLanguageIfMissing,
+  listActiveLemmaKeys,
   markUncountedWordsAsOutside,
   saveWord,
   setActiveVocabVersion,
@@ -30,6 +31,9 @@ export function importBaseline(language: string): BaselineImportResult {
 
     const activeWordsImported = activeVocabVersion === 0;
     if (activeWordsImported) {
+      if (baseline.activeWords.length === 0) {
+        throw new Error(`${language} のベースラインに手札語彙の語がありません。${filePath} を確かめてください。`);
+      }
       const version = 1;
       for (const word of baseline.activeWords) {
         const wordId = saveWord(db, {
@@ -55,12 +59,17 @@ export function importBaseline(language: string): BaselineImportResult {
       setActiveVocabVersion(db, language, version);
     }
 
+    const activeLemmaKeys = listActiveLemmaKeys(db, language);
     markUncountedWordsAsOutside(db, language);
     for (const word of baseline.uncountedWords) {
+      const lemmaKey = normalizeLemma(word.lemma);
+      if (activeLemmaKeys.has(lemmaKey)) {
+        throw new Error(`「${word.lemma}」は手札語彙に入っているので、ノーカン語彙にはできません。${filePath} を確かめてください。`);
+      }
       saveWord(db, {
         language,
         lemma: word.lemma,
-        lemmaKey: normalizeLemma(word.lemma),
+        lemmaKey,
         meaning: null,
         partOfSpeech: word.partOfSpeech,
         vocabStatus: "uncounted",
