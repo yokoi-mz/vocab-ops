@@ -49,6 +49,13 @@ export function resetRunningVocabUpdates(db: DatabaseSync): void {
   db.prepare("UPDATE vocab_updates SET status = 'pending', started_at = NULL WHERE status = 'running'").run();
 }
 
+// まだ終わっていない（待ち・実行中の）語彙更新の数
+export function countUnfinishedVocabUpdates(db: DatabaseSync, language: string): number {
+  return z.object({ count: z.number() }).parse(
+    db.prepare("SELECT COUNT(*) AS count FROM vocab_updates WHERE language = ? AND status IN ('pending', 'running')").get(language),
+  ).count;
+}
+
 // ---- 実行中に書く ----
 
 export type VocabUpdateContext = {
@@ -210,5 +217,38 @@ export function listVocabUpdates(db: DatabaseSync, language: string, limit: numb
         createdAt: update.created_at,
         finishedAt: update.finished_at,
       };
+    });
+}
+
+const proposalWordRowSchema = z.object({
+  vocab_update_id: z.number(),
+  candidate_type: z.enum(["addition", "removal"]),
+  lemma: z.string(),
+  meaning: z.string().nullable(),
+});
+
+export type ProposalWord = {
+  vocabUpdateId: number;
+  candidateType: CandidateType;
+  lemma: string;
+  meaning: string | null;
+};
+
+// 語彙更新の更新案に入れた語（足す語・外す語）を返す。
+export function listProposalWords(db: DatabaseSync, vocabUpdateIds: number[]): ProposalWord[] {
+  if (vocabUpdateIds.length === 0) {
+    return [];
+  }
+  return db
+    .prepare(`
+      SELECT c.vocab_update_id, c.candidate_type, w.lemma, w.meaning
+      FROM vocab_update_candidates c JOIN words w ON w.id = c.word_id
+      WHERE c.in_proposal = 1 AND c.vocab_update_id IN (${vocabUpdateIds.map(() => "?").join(", ")})
+      ORDER BY c.vocab_update_id, c.candidate_type, c.rank
+    `)
+    .all(...vocabUpdateIds)
+    .map((row) => {
+      const word = proposalWordRowSchema.parse(row);
+      return { vocabUpdateId: word.vocab_update_id, candidateType: word.candidate_type, lemma: word.lemma, meaning: word.meaning };
     });
 }

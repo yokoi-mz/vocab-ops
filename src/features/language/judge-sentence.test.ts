@@ -35,6 +35,12 @@ test("手札外語彙の語が上限以下なら合格", () => {
   assert.deepEqual(result.outsideLemmas, ["six", "mois"]);
 });
 
+test("句読点だけの単語は、語として扱わない", () => {
+  const result = judgeSentence(frenchLookup, "J'ai vécu six mois en Italie ?", [...frenchTokens, word("?", "?")], 2);
+  assert.deepEqual(result.problems, []);
+  assert.equal(result.tokens.length, frenchTokens.length);
+});
+
 test("チェック A：手札外語彙の語が上限を超えたら不合格", () => {
   const result = judgeSentence(frenchLookup, "J'ai vécu six mois en Italie.", frenchTokens, 0);
   assert.deepEqual(result.problems, [{ type: "too_many_outside_words", outsideLemmas: ["six", "mois"], limit: 0 }]);

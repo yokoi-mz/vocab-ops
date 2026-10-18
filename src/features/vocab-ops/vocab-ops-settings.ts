@@ -1,3 +1,5 @@
+import type { VocabSizeMode } from "@/features/vocabulary";
+
 // 語彙更新の数値。docs/vocab-ops/parameters.md と同じ値にする。
 // 値を変えたら、parameters.md の「変更履歴」に理由とともに残す。
 // 語彙更新のたびに、この値を記録（vocab_updates.settings_json）に残す。
@@ -30,6 +32,10 @@ export const vocabOpsSettings = {
 } as const;
 
 export type VocabOpsSettings = typeof vocabOpsSettings;
+
+// 画面で選べる増減モード。最初は「増やす」だけ（04-vocab-size-mode.md）。
+// 削除候補が出るほど履歴がたまったら、"keep" と "decrease" を足す。
+export const selectableVocabSizeModes: VocabSizeMode[] = ["increase"];
 
 // 語彙更新で使う AI のモデル（追加候補の順位付け、語彙更新検証の比較判定）
 export const vocabOpsModel = "deepseek/deepseek-v4.1-flash";

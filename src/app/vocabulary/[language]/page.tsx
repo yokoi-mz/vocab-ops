@@ -4,9 +4,12 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import type { CSSProperties } from "react";
 import { getLanguageName } from "@/features/language";
-import { getVocabulary, listImportedLanguages, type VocabWord } from "@/features/vocabulary";
+import { countGenerationsUntilNextUpdate, listRecentVocabUpdates, selectableVocabSizeModes } from "@/features/vocab-ops";
+import { getLanguageStatus, getVocabulary, listImportedLanguages, type VocabWord } from "@/features/vocabulary";
 import { Flag } from "@/shared/ui/flag";
 import styles from "./page.module.css";
+import { RecentUpdates } from "./recent-updates";
+import { VocabSizeModeSwitch } from "./vocab-size-mode-switch";
 
 type VocabularyPageProps = {
   params: Promise<{ language: string }>;
@@ -26,6 +29,11 @@ export default async function VocabularyPage({ params }: VocabularyPageProps) {
   }
 
   const { activeVocab, uncountedVocab } = getVocabulary(language);
+  const status = getLanguageStatus(language);
+  const generationsUntilNextUpdate = countGenerationsUntilNextUpdate(language);
+  const recentUpdates = listRecentVocabUpdates(language, 5);
+  // 最近の語彙更新で足した語（今の版で手札語彙に入った語）に印を付ける。ベースライン（版1）の語には付けない
+  const isNew = (word: VocabWord) => status.activeVocabVersion > 1 && word.addedVersion === status.activeVocabVersion;
 
   return (
     <main>
@@ -45,6 +53,17 @@ export default async function VocabularyPage({ params }: VocabularyPageProps) {
         </p>
       </div>
 
+      <div className={`panel ${styles.opsRow}`}>
+        <span className={styles.opsLabel}>増減モード</span>
+        <VocabSizeModeSwitch language={language} current={status.vocabSizeMode} selectable={selectableVocabSizeModes} />
+        <span className={styles.opsNext}>
+          次の語彙更新まで、あと <strong>{generationsUntilNextUpdate}</strong> 回の文生成
+        </span>
+      </div>
+
+      <h2 className={styles.sectionTitle}>最近の語彙更新</h2>
+      <RecentUpdates updates={recentUpdates} />
+
       <h2 className={styles.sectionTitle}>手札語彙</h2>
       <div className={styles.groups}>
         {groupByPartOfSpeech(activeVocab).map(([partOfSpeech, words]) => (
@@ -62,7 +81,10 @@ export default async function VocabularyPage({ params }: VocabularyPageProps) {
               <tbody>
                 {words.map((word) => (
                   <tr key={word.id}>
-                    <td className={styles.lemma}>{word.lemma}</td>
+                    <td className={styles.lemma}>
+                      {word.lemma}
+                      {isNew(word) && <span className={styles.newBadge}>NEW</span>}
+                    </td>
                     <td className={styles.meaning}>{word.meaning}</td>
                   </tr>
                 ))}
@@ -93,10 +115,27 @@ export default async function VocabularyPage({ params }: VocabularyPageProps) {
 function groupByPartOfSpeech(words: VocabWord[]): [string, VocabWord[]][] {
   const groups = new Map<string, VocabWord[]>();
   for (const word of words) {
-    const key = word.partOfSpeech ?? "その他";
+    const key = toPartOfSpeechHeading(word.partOfSpeech ?? "その他", [...groups.keys()]);
     groups.set(key, [...(groups.get(key) ?? []), word]);
   }
   return [...groups.entries()];
+}
+
+// 語彙更新で足した語の品詞は、文生成のときに AI が英語で付けたもの（noun など）なので、
+// ベースラインの品詞の見出し（名詞、副詞・数量・その他 など）のうち、合うものにまとめる。
+const japanesePartsOfSpeech: Record<string, string> = {
+  noun: "名詞",
+  verb: "動詞",
+  adjective: "形容詞",
+  adverb: "副詞",
+};
+
+function toPartOfSpeechHeading(partOfSpeech: string, headings: string[]): string {
+  const japanese = japanesePartsOfSpeech[partOfSpeech];
+  if (japanese === undefined) {
+    return partOfSpeech;
+  }
+  return headings.find((heading) => heading.startsWith(japanese)) ?? japanese;
 }
 
 // 品詞の見出しごとの色（旧版の品詞の色に合わせる）

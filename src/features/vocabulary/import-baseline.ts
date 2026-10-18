@@ -53,6 +53,7 @@ export function importBaseline(language: string): BaselineImportResult {
           version,
           generationSeq: lastGenerationSeq,
           source: "baseline_import",
+          vocabUpdateId: null,
           reason: null,
         });
       }

@@ -2,7 +2,7 @@ import { getDatabase } from "@/shared/db";
 import {
   countDoneGenerationsAfter,
   findGeneration,
-  listDoneGenerationSeqs,
+  listDoneGenerationRefs,
   listSentences,
   listWordOccurrences,
   type WordOccurrence,
@@ -18,7 +18,12 @@ export function countDoneGenerationsSince(language: string, afterSeq: number): n
 
 // 完了した文生成の通し番号（新しい順）。
 export function listDoneSeqs(language: string): number[] {
-  return listDoneGenerationSeqs(getDatabase(), language);
+  return listDoneGenerationRefs(getDatabase(), language).map((ref) => ref.seq);
+}
+
+// 完了した文生成の番号と通し番号（新しい順）。
+export function listDoneGenerations(language: string): { id: number; seq: number }[] {
+  return listDoneGenerationRefs(getDatabase(), language);
 }
 
 // 手札語彙の語が使われた文生成（手札語彙文・拡張語彙文のどちらか。文生成ごとに1回）。

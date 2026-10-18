@@ -98,3 +98,114 @@
   width: 40%;
   color: var(--color-text-muted);
 }
+
+.opsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-top: 20px;
+  padding: 14px 18px;
+}
+
+.opsLabel {
+  color: var(--color-text-faint);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.opsNext {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.opsNext strong {
+  color: var(--color-mint);
+}
+
+.newBadge {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgb(143 217 200 / 0.18);
+  color: var(--color-mint);
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: 2px;
+}
+
+.updateList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.update {
+  padding: 12px 18px;
+  border-radius: 14px;
+}
+
+.updateHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.updateDate {
+  color: var(--color-text-faint);
+  font-size: 12px;
+}
+
+.outcome {
+  padding: 1px 10px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.outcomeApplied {
+  border-color: rgb(143 217 200 / 0.6);
+  color: var(--color-mint);
+}
+
+.outcomeFailed {
+  border-color: rgb(255 107 107 / 0.6);
+  color: var(--color-outside);
+}
+
+.updateWords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.added,
+.removed {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.added {
+  background: rgb(143 217 200 / 0.14);
+  color: var(--color-mint);
+}
+
+.removed {
+  background: rgb(255 107 107 / 0.12);
+  color: var(--color-outside);
+}
+
+.updateReason {
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}

@@ -94,14 +94,51 @@ export type ActiveVocabChange = {
   version: number;
   generationSeq: number;
   source: "baseline_import" | "vocab_update";
+  vocabUpdateId: number | null;
   reason: string | null;
 };
 
 export function insertActiveVocabChange(db: DatabaseSync, change: ActiveVocabChange): void {
   db.prepare(`
-    INSERT INTO active_vocab_changes (word_id, language, change, version, generation_seq, source, reason)
-    VALUES (:wordId, :language, :change, :version, :generationSeq, :source, :reason)
+    INSERT INTO active_vocab_changes (word_id, language, change, version, generation_seq, source, vocab_update_id, reason)
+    VALUES (:wordId, :language, :change, :version, :generationSeq, :source, :vocabUpdateId, :reason)
   `).run(change);
+}
+
+// 手札外語彙の語を、手札語彙に入れる。今が手札外語彙でなければ何もせず false を返す。
+export function moveWordToActive(db: DatabaseSync, wordId: number, version: number, generationSeq: number): boolean {
+  const result = db
+    .prepare(`
+      UPDATE words SET vocab_status = 'active', added_version = ?, added_generation_seq = ?
+      WHERE id = ? AND vocab_status = 'outside'
+    `)
+    .run(version, generationSeq, wordId);
+  return result.changes === 1;
+}
+
+// 手札語彙の語を、手札外語彙に戻す。今が手札語彙でなければ何もせず false を返す。
+export function moveWordToOutside(db: DatabaseSync, wordId: number): boolean {
+  const result = db
+    .prepare(`
+      UPDATE words SET vocab_status = 'outside', added_version = NULL, added_generation_seq = NULL
+      WHERE id = ? AND vocab_status = 'active'
+    `)
+    .run(wordId);
+  return result.changes === 1;
+}
+
+export function setVocabSizeMode(db: DatabaseSync, language: string, mode: VocabSizeMode): void {
+  db.prepare("UPDATE languages SET vocab_size_mode = ? WHERE code = ?").run(mode, language);
+}
+
+// 語彙更新を始めたことを記録する。その時点の文生成の通し番号を返す。
+export function markVocabUpdateStarted(db: DatabaseSync, language: string): number {
+  return z.object({ last_vocab_update_seq: z.number() }).parse(
+    db.prepare(`
+      UPDATE languages SET last_vocab_update_seq = last_generation_seq WHERE code = ?
+      RETURNING last_vocab_update_seq
+    `).get(language),
+  ).last_vocab_update_seq;
 }
 
 const lemmaKeyRowSchema = z.object({ lemma_key: z.string() });
@@ -124,6 +161,7 @@ const wordRowSchema = z.object({
   meaning: z.string().nullable(),
   part_of_speech: z.string().nullable(),
   vocab_status: z.enum(["active", "uncounted", "outside"]),
+  added_version: z.number().nullable(),
   added_generation_seq: z.number().nullable(),
 });
 
@@ -133,11 +171,12 @@ export type VocabWord = {
   meaning: string | null;
   partOfSpeech: string | null;
   vocabStatus: VocabStatus;
-  // 今回、手札語彙に入ったときの文生成の通し番号（手札語彙の語だけ）
+  // 今回、手札語彙に入ったときの手札語彙の版と、文生成の通し番号（手札語彙の語だけ）
+  addedVersion: number | null;
   addedGenerationSeq: number | null;
 };
 
-const wordColumns = "id, lemma, meaning, part_of_speech, vocab_status, added_generation_seq";
+const wordColumns = "id, lemma, meaning, part_of_speech, vocab_status, added_version, added_generation_seq";
 
 function toVocabWord(row: unknown): VocabWord {
   const word = wordRowSchema.parse(row);
@@ -147,6 +186,7 @@ function toVocabWord(row: unknown): VocabWord {
     meaning: word.meaning,
     partOfSpeech: word.part_of_speech,
     vocabStatus: word.vocab_status,
+    addedVersion: word.added_version,
     addedGenerationSeq: word.added_generation_seq,
   };
 }

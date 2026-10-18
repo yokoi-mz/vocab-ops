@@ -35,7 +35,10 @@ export function judgeSentence<T extends AnswerToken>(
   tokens: T[],
   outsideWordLimit: number,
 ): SentenceJudgement<T> {
-  const judgedTokens = tokens.map((token) => ({ ...token, ...judgeToken(lookup, token) }));
+  // 句読点だけの単語（AI が「?」などを1語として書き出したもの）は、語として扱わない
+  const judgedTokens = tokens
+    .filter((token) => /[\p{L}\p{N}]/u.test(token.surface))
+    .map((token) => ({ ...token, ...judgeToken(lookup, token) }));
   const outsideLemmas = [
     ...new Set(judgedTokens.filter((token) => token.judgement === "outside").map((token) => normalizeLemma(token.lemma))),
   ];

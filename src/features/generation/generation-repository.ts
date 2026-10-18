@@ -135,12 +135,12 @@ export function countDoneGenerationsAfter(db: DatabaseSync, language: string, af
   ).count;
 }
 
-// 完了した文生成の通し番号を、新しい順に返す。
-export function listDoneGenerationSeqs(db: DatabaseSync, language: string): number[] {
+// 完了した文生成の番号と通し番号を、新しい順に返す。
+export function listDoneGenerationRefs(db: DatabaseSync, language: string): { id: number; seq: number }[] {
   return db
-    .prepare("SELECT seq FROM generations WHERE language = ? AND status = 'done' ORDER BY seq DESC")
+    .prepare("SELECT id, seq FROM generations WHERE language = ? AND status = 'done' ORDER BY seq DESC")
     .all(language)
-    .map((row) => z.object({ seq: z.number() }).parse(row).seq);
+    .map((row) => z.object({ id: z.number(), seq: z.number() }).parse(row));
 }
 
 export type WordOccurrence = {
@@ -196,6 +196,7 @@ const generationRowSchema = z.object({
   speaker: z.enum(["female", "male"]),
   active_vocab_version: z.number().nullable(),
   model: z.string().nullable(),
+  prompt_version: z.string().nullable(),
   expanded_outside_word_limit: z.number().nullable(),
   cost_usd: z.number().nullable(),
   error: z.string().nullable(),
@@ -212,6 +213,7 @@ export type Generation = {
   speaker: Speaker;
   activeVocabVersion: number | null;
   model: string | null;
+  promptVersion: string | null;
   expandedOutsideWordLimit: number | null;
   costUsd: number | null;
   error: string | null;
@@ -230,6 +232,7 @@ function toGeneration(row: unknown): Generation {
     speaker: generation.speaker,
     activeVocabVersion: generation.active_vocab_version,
     model: generation.model,
+    promptVersion: generation.prompt_version,
     expandedOutsideWordLimit: generation.expanded_outside_word_limit,
     costUsd: generation.cost_usd,
     error: generation.error,
@@ -238,7 +241,7 @@ function toGeneration(row: unknown): Generation {
 }
 
 const generationColumns =
-  "id, language, seq, status, message, situation, speaker, active_vocab_version, model, expanded_outside_word_limit, cost_usd, error, created_at";
+  "id, language, seq, status, message, situation, speaker, active_vocab_version, model, prompt_version, expanded_outside_word_limit, cost_usd, error, created_at";
 
 export function findGeneration(db: DatabaseSync, id: number): Generation | undefined {
   const row = db.prepare(`SELECT ${generationColumns} FROM generations WHERE id = ?`).get(id);

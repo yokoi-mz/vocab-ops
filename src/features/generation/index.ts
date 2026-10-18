@@ -1,8 +1,10 @@
+export { canReuseCurrentSetSentence, generateCurrentSetSentence } from "./generate-for-validation";
 export { deleteGeneration, type DeleteGenerationResult } from "./delete-generation";
 export {
   countDoneGenerationsSince,
   getDoneGenerationDetails,
   listActiveWordUsages,
+  listDoneGenerations,
   listDoneSeqs,
   listOutsideWordAppearances,
 } from "./generation-history";
