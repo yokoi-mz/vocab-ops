@@ -1,0 +1,17 @@
+.header {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 12px 16px;
+}
+
+.appName {
+  color: var(--color-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
