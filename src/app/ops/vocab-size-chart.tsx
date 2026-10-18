@@ -46,7 +46,8 @@ export function VocabSizeChart({ history, currentSeq, currentSize }: VocabSizeCh
   const area = `${line} L ${x(points.at(-1)?.seq ?? 0)} ${padding.top + plotHeight} L ${x(points[0].seq)} ${padding.top + plotHeight} Z`;
 
   const yTicks = Array.from({ length: Math.round((yMax - yMin) / step) + 1 }, (_, index) => yMin + step * index);
-  const xTicks = [0, Math.round(xMax / 2), xMax];
+  // 文生成がまだ少ないと、真ん中と右端の目盛りが同じ数になるので、同じ数は1つにまとめる
+  const xTicks = [...new Set([0, Math.round(xMax / 2), xMax])];
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className={styles.chart} role="img" aria-label="手札語彙の語数の移り変わり">

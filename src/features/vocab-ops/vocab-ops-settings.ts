@@ -1,4 +1,5 @@
 import type { VocabSizeMode } from "@/features/vocabulary";
+import type { ProviderRouting } from "@/shared/openrouter";
 
 // 語彙更新の数値。docs/vocab-ops/parameters.md と同じ値にする。
 // 値を変えたら、parameters.md の「変更履歴」に理由とともに残す。
@@ -37,8 +38,9 @@ export type VocabOpsSettings = typeof vocabOpsSettings;
 // 「減らす」は、削除候補が出るほど履歴がたまったら足す。
 export const selectableVocabSizeModes: VocabSizeMode[] = ["increase", "keep"];
 
-// 語彙更新で使う AI のモデル（追加候補の順位付け、語彙更新検証の比較判定）
+// 語彙更新で使う AI のモデル（追加候補の順位付け、語彙更新検証の比較判定）と、それを動かす会社（文生成と同じ）
 export const vocabOpsModel = "deepseek/deepseek-v4.1-flash";
+export const vocabOpsProvider: ProviderRouting = { only: ["deepinfra"], quantizations: ["fp8"], allowFallbacks: false };
 
 // 語彙更新のプロンプトを変えたら、この版を進める
 export const vocabOpsPromptVersion = "2026-10-18.2";

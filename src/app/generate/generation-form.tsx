@@ -163,7 +163,14 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
         </label>
         <div className={styles.row}>
           <button type="submit" className="primary-button" disabled={message.trim() === "" || isWaiting}>
-            {isWaiting ? "作成中…" : "文を作る"}
+            {isWaiting ? (
+              <>
+                <span className={styles.buttonSpinner} aria-hidden="true" />
+                作成中
+              </>
+            ) : (
+              "文を作る"
+            )}
           </button>
           <span className={styles.hint}>⌘ + Enter でも送れます</span>
         </div>

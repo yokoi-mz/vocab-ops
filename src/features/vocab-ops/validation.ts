@@ -9,7 +9,7 @@ import {
 import type { VocabSizeMode, VocabSnapshot } from "@/features/vocabulary";
 import { callOpenRouter } from "@/shared/openrouter";
 import type { ValidationJudgement } from "./vocab-update-repository";
-import { vocabOpsModel, vocabOpsSettings } from "./vocab-ops-settings";
+import { vocabOpsModel, vocabOpsProvider, vocabOpsSettings } from "./vocab-ops-settings";
 
 // 語彙更新検証（05-validation.md）。足す語と外す語の両方を含む更新案だけに行う。
 // 過去の履歴の原文それぞれについて、今の手札語彙文と提案語彙文を比べ、増減モードの合格の基準で判断する。
@@ -194,7 +194,7 @@ Output ONLY one JSON object, no prose:
 
 ${problems.join("\n\n")}`;
 
-  const result = await callOpenRouter(vocabOpsModel, [{ role: "user", content: prompt }]);
+  const result = await callOpenRouter(vocabOpsModel, [{ role: "user", content: prompt }], vocabOpsProvider);
   const text = result.text;
   let parsed: z.infer<typeof answersSchema> | undefined;
   try {

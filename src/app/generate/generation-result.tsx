@@ -37,7 +37,12 @@ export function GenerationResult({ generation, languageName, speechLang, voiceNa
           </span>
         )}
       </div>
-      {isWaiting && <p className={styles.waiting}>文を作っています。10〜20 秒ほどかかります（ワーカーが動いている必要があります）。</p>}
+      {isWaiting && (
+        <p className={styles.waiting}>
+          <span className={styles.spinner} aria-hidden="true" />
+          文を作っています
+        </p>
+      )}
       {generation.status === "failed" && <p className={styles.warning}>文を作れませんでした：{generation.error}</p>}
       <div className={styles.cards}>
         {currentSet !== undefined && (

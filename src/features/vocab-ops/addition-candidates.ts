@@ -3,7 +3,7 @@ import { getDoneGenerationDetails, listDoneSeqs, listOutsideWordAppearances, typ
 import { getLanguageRules, normalizeLemma } from "@/features/language";
 import { getWordsByIds, type VocabWord } from "@/features/vocabulary";
 import { callOpenRouter } from "@/shared/openrouter";
-import { vocabOpsModel } from "./vocab-ops-settings";
+import { vocabOpsModel, vocabOpsProvider } from "./vocab-ops-settings";
 
 // 追加候補（02-addition-candidates.md）。
 // 直近の文生成の拡張語彙文に出てきた手札外語彙の語を数え（プログラム）、LLM に順位を付けさせる。
@@ -62,9 +62,11 @@ export async function rankAdditionCandidates(
     return { ranked: [], costUsd: 0 };
   }
   const generations = getDoneGenerationDetails([...new Set(candidates.flatMap((candidate) => candidate.generationIds))]);
-  const result = await callOpenRouter(vocabOpsModel, [
-    { role: "user", content: buildRankingPrompt(language, candidates, activeWords, generations) },
-  ]);
+  const result = await callOpenRouter(
+    vocabOpsModel,
+    [{ role: "user", content: buildRankingPrompt(language, candidates, activeWords, generations) }],
+    vocabOpsProvider,
+  );
 
   const text = result.text;
   const parsed = rankingSchema.safeParse(safeJsonParse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1)));

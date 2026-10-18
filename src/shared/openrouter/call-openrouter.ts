@@ -15,6 +15,16 @@ export type ChatResult = {
 
 export class OpenRouterError extends Error {}
 
+// どの会社（プロバイダー）にモデルを動かしてもらうか。指定しなければ、OpenRouter が呼ぶたびに選ぶ
+export type ProviderRouting = {
+  // この会社だけを使う（OpenRouter のプロバイダーの名前。例："deepinfra"）
+  only: string[];
+  // この精度の動かし方だけを使う（例："fp8"）
+  quantizations?: string[];
+  // 指定した会社が使えないときに、ほかの会社に回すか
+  allowFallbacks: boolean;
+};
+
 const responseSchema = z.object({
   choices: z
     .array(z.object({ message: z.object({ content: z.string().nullable() }) }))
@@ -24,7 +34,7 @@ const responseSchema = z.object({
 
 // OpenRouter のチャットの API を1回呼び、返事の本文と費用（ドル）を返す。
 // 推論（thinking）は切り、返事は JSON のオブジェクトにするよう指定する。
-export async function callOpenRouter(model: string, messages: ChatMessage[]): Promise<ChatResult> {
+export async function callOpenRouter(model: string, messages: ChatMessage[], provider?: ProviderRouting): Promise<ChatResult> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     throw new OpenRouterError("環境変数 OPENROUTER_API_KEY がありません。.env.local に書いてください。");
@@ -46,6 +56,9 @@ export async function callOpenRouter(model: string, messages: ChatMessage[]): Pr
         response_format: { type: "json_object" },
         reasoning: { enabled: false },
         usage: { include: true },
+        ...(provider === undefined
+          ? {}
+          : { provider: { only: provider.only, quantizations: provider.quantizations, allow_fallbacks: provider.allowFallbacks } }),
       }),
       signal: AbortSignal.timeout(timeoutMs),
     });

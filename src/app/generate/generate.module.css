@@ -191,8 +191,41 @@
 }
 
 .waiting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin: 28px 4px;
   color: var(--color-text-muted);
+}
+
+/* 作成中のクルクル。表示している間だけ回る */
+.spinner,
+.buttonSpinner {
+  display: inline-block;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgb(167 139 250 / 0.2);
+  border-top-color: var(--color-mint);
+}
+
+.buttonSpinner {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 2px solid rgb(26 15 46 / 0.25);
+  border-top-color: #1a0f2e;
+  vertical-align: -2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .history {

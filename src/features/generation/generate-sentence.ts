@@ -1,7 +1,7 @@
 import { judgeSentence, type SentenceJudgement, type SentenceProblem, type VocabLookup } from "@/features/language";
 import { callOpenRouter } from "@/shared/openrouter";
 import { parseAnswer, type Answer, type AnswerTokenWithMeaning } from "./answer";
-import { generationModel, maxAttempts } from "./generation-settings";
+import { generationModel, generationProvider, maxAttempts } from "./generation-settings";
 import { buildFeedback, buildPrompt, systemPrompt, type PromptInput } from "./prompt";
 
 export type SentenceResult = {
@@ -33,10 +33,14 @@ export async function generateSentence(input: Omit<PromptInput, "feedback">, loo
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     let text: string;
     try {
-      const result = await callOpenRouter(generationModel, [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: buildPrompt({ ...input, feedback }) },
-      ]);
+      const result = await callOpenRouter(
+        generationModel,
+        [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: buildPrompt({ ...input, feedback }) },
+        ],
+        generationProvider,
+      );
       costUsd += result.costUsd;
       text = result.text;
     } catch (error) {
