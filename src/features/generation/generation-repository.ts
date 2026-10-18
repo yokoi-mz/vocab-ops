@@ -126,6 +126,52 @@ export function failGeneration(db: DatabaseSync, id: number, error: string, cost
   );
 }
 
+// ---- 語彙更新が使う履歴 ----
+// 回数は、通し番号の引き算ではなく、残っている（削除されていない）完了した文生成の数で数える。
+
+export function countDoneGenerationsAfter(db: DatabaseSync, language: string, afterSeq: number): number {
+  return z.object({ count: z.number() }).parse(
+    db.prepare("SELECT COUNT(*) AS count FROM generations WHERE language = ? AND status = 'done' AND seq > ?").get(language, afterSeq),
+  ).count;
+}
+
+// 完了した文生成の通し番号を、新しい順に返す。
+export function listDoneGenerationSeqs(db: DatabaseSync, language: string): number[] {
+  return db
+    .prepare("SELECT seq FROM generations WHERE language = ? AND status = 'done' ORDER BY seq DESC")
+    .all(language)
+    .map((row) => z.object({ seq: z.number() }).parse(row).seq);
+}
+
+export type WordOccurrence = {
+  wordId: number;
+  generationId: number;
+  seq: number;
+};
+
+// 文生成ごとに1回と数えた、語の出現。judgement と sentenceType で絞る（sentenceType が null なら両方の文）。
+export function listWordOccurrences(
+  db: DatabaseSync,
+  language: string,
+  judgement: TokenJudgement,
+  sentenceType: SentenceType | null,
+): WordOccurrence[] {
+  return db
+    .prepare(`
+      SELECT DISTINCT t.word_id AS word_id, g.id AS generation_id, g.seq AS seq
+      FROM generation_tokens t
+      JOIN generation_sentences s ON s.id = t.sentence_id
+      JOIN generations g ON g.id = s.generation_id
+      WHERE g.language = ? AND g.status = 'done' AND t.judgement = ? AND t.word_id IS NOT NULL
+        AND (? IS NULL OR s.sentence_type = ?)
+    `)
+    .all(language, judgement, sentenceType, sentenceType)
+    .map((row) => {
+      const occurrence = z.object({ word_id: z.number(), generation_id: z.number(), seq: z.number() }).parse(row);
+      return { wordId: occurrence.word_id, generationId: occurrence.generation_id, seq: occurrence.seq };
+    });
+}
+
 // ---- 消す ----
 
 // 文生成1回分の単語・文・記録を消す。呼ぶ側でトランザクションを張る。

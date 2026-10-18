@@ -1,5 +1,5 @@
 import { getDatabase } from "@/shared/db";
-import { listLanguageCodes, listWordsByStatus, type VocabWord } from "./vocabulary-repository";
+import { findWordsByIds, listLanguageCodes, listWordsByStatus, type VocabWord } from "./vocabulary-repository";
 
 export type Vocabulary = {
   activeVocab: VocabWord[];
@@ -16,4 +16,8 @@ export function getVocabulary(language: string): Vocabulary {
 
 export function listImportedLanguages(): string[] {
   return listLanguageCodes(getDatabase());
+}
+
+export function getWordsByIds(ids: number[]): VocabWord[] {
+  return findWordsByIds(getDatabase(), ids);
 }

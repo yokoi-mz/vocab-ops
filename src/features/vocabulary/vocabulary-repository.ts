@@ -123,6 +123,8 @@ const wordRowSchema = z.object({
   lemma: z.string(),
   meaning: z.string().nullable(),
   part_of_speech: z.string().nullable(),
+  vocab_status: z.enum(["active", "uncounted", "outside"]),
+  added_generation_seq: z.number().nullable(),
 });
 
 export type VocabWord = {
@@ -130,23 +132,40 @@ export type VocabWord = {
   lemma: string;
   meaning: string | null;
   partOfSpeech: string | null;
+  vocabStatus: VocabStatus;
+  // 今回、手札語彙に入ったときの文生成の通し番号（手札語彙の語だけ）
+  addedGenerationSeq: number | null;
 };
 
+const wordColumns = "id, lemma, meaning, part_of_speech, vocab_status, added_generation_seq";
+
+function toVocabWord(row: unknown): VocabWord {
+  const word = wordRowSchema.parse(row);
+  return {
+    id: word.id,
+    lemma: word.lemma,
+    meaning: word.meaning,
+    partOfSpeech: word.part_of_speech,
+    vocabStatus: word.vocab_status,
+    addedGenerationSeq: word.added_generation_seq,
+  };
+}
+
 export function listWordsByStatus(db: DatabaseSync, language: string, vocabStatus: VocabStatus): VocabWord[] {
-  const rows = db.prepare(`
-    SELECT id, lemma, meaning, part_of_speech FROM words
-    WHERE language = ? AND vocab_status = ?
-    ORDER BY id
-  `).all(language, vocabStatus);
-  return rows.map((row) => {
-    const word = wordRowSchema.parse(row);
-    return {
-      id: word.id,
-      lemma: word.lemma,
-      meaning: word.meaning,
-      partOfSpeech: word.part_of_speech,
-    };
-  });
+  return db
+    .prepare(`SELECT ${wordColumns} FROM words WHERE language = ? AND vocab_status = ? ORDER BY id`)
+    .all(language, vocabStatus)
+    .map(toVocabWord);
+}
+
+export function findWordsByIds(db: DatabaseSync, ids: number[]): VocabWord[] {
+  if (ids.length === 0) {
+    return [];
+  }
+  return db
+    .prepare(`SELECT ${wordColumns} FROM words WHERE id IN (${ids.map(() => "?").join(", ")})`)
+    .all(...ids)
+    .map(toVocabWord);
 }
 
 // 手札外語彙の語を登録する。すでに手札外語彙の語として登録されていれば、意味と品詞を最新の値に書き換える。

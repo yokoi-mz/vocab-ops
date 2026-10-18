@@ -1,4 +1,4 @@
-export { getVocabulary, listImportedLanguages, type Vocabulary } from "./get-vocabulary";
+export { getVocabulary, getWordsByIds, listImportedLanguages, type Vocabulary } from "./get-vocabulary";
 export { importBaseline } from "./import-baseline";
 export {
   createVocabSnapshot,
