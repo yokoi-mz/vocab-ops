@@ -4,6 +4,7 @@ import { z } from "zod";
 const languageRowSchema = z.object({
   voice_name: z.string().nullable(),
   vocab_size_mode: z.enum(["increase", "keep", "decrease"]),
+  vocab_update_size: z.union([z.literal(3), z.literal(4), z.literal(5)]),
   expanded_outside_word_limit: z.number(),
   active_vocab_version: z.number(),
   last_generation_seq: z.number(),
@@ -12,10 +13,14 @@ const languageRowSchema = z.object({
 
 export type VocabSizeMode = "increase" | "keep" | "decrease";
 
+// 語彙更新の幅：1回の語彙更新で増やす・減らす語数と、入れ替える語数の上限（同じ数）
+export type VocabUpdateSize = 3 | 4 | 5;
+
 export type LanguageState = {
   // 読み上げに使う声の名前。null なら自動で選ぶ
   voiceName: string | null;
   vocabSizeMode: VocabSizeMode;
+  vocabUpdateSize: VocabUpdateSize;
   expandedOutsideWordLimit: number;
   activeVocabVersion: number;
   lastGenerationSeq: number;
@@ -29,13 +34,14 @@ export function insertLanguageIfMissing(db: DatabaseSync, language: string): voi
 export function getLanguageState(db: DatabaseSync, language: string): LanguageState {
   const row = languageRowSchema.parse(
     db.prepare(`
-      SELECT voice_name, vocab_size_mode, expanded_outside_word_limit, active_vocab_version, last_generation_seq, last_vocab_update_seq
+      SELECT voice_name, vocab_size_mode, vocab_update_size, expanded_outside_word_limit, active_vocab_version, last_generation_seq, last_vocab_update_seq
       FROM languages WHERE code = ?
     `).get(language),
   );
   return {
     voiceName: row.voice_name,
     vocabSizeMode: row.vocab_size_mode,
+    vocabUpdateSize: row.vocab_update_size,
     expandedOutsideWordLimit: row.expanded_outside_word_limit,
     activeVocabVersion: row.active_vocab_version,
     lastGenerationSeq: row.last_generation_seq,
@@ -134,6 +140,7 @@ export function moveWordToOutside(db: DatabaseSync, wordId: number): boolean {
 export type LanguageSettings = {
   voiceName: string | null;
   vocabSizeMode: VocabSizeMode;
+  vocabUpdateSize: VocabUpdateSize;
   expandedOutsideWordLimit: number;
 };
 
@@ -142,6 +149,7 @@ export function updateLanguageSettings(db: DatabaseSync, language: string, setti
   const columns: [keyof LanguageSettings, string][] = [
     ["voiceName", "voice_name"],
     ["vocabSizeMode", "vocab_size_mode"],
+    ["vocabUpdateSize", "vocab_update_size"],
     ["expandedOutsideWordLimit", "expanded_outside_word_limit"],
   ];
   for (const [key, column] of columns) {

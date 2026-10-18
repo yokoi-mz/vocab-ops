@@ -50,6 +50,7 @@ erDiagram
 |---|---|---|
 | `code` | 言語コード（`en`・`fr` など）。この表の主キー | 言語は ISO 639-1 のコードで表すと決めているため |
 | `vocab_size_mode` | 増減モード（`increase`・`keep`・`decrease`） | 言語ごとにユーザーが選び、変えるまで保持するため |
+| `vocab_update_size` | 語彙更新の幅（3・4・5）。1回の語彙更新で増やす・減らす語数と、入れ替える語数の上限 | 言語ごとに設定の画面で選べるようにするため（`vocab-ops/04-vocab-size-mode.md`） |
 | `voice_name` | 読み上げに使う声の名前。空なら自動で選ぶ | 言語ごとに声を選べるようにするため |
 | `expanded_outside_word_limit` | 拡張語彙文で使ってよい手札外語彙の語の数の上限 | 設定で変えられるようにするため |
 | `active_vocab_version` | 今の手札語彙の版 | 手札語彙が変わるたびに1つ進める |
@@ -62,6 +63,7 @@ erDiagram
 
 - 増減モード（`vocab_size_mode`）は `increase` にする。最初は手札語彙を増やす方向で使い始める。あとで画面から変えられる。
 - 拡張語彙文で使ってよい手札外語彙の語の数の上限（`expanded_outside_word_limit`）は 5 にする（`vocab-ops/parameters.md`）。
+- 語彙更新の幅（`vocab_update_size`）は 4 にする（`vocab-ops/parameters.md`）。
 - 手札語彙の版と、2つの通し番号は 0 にする。手札語彙の版は、ベースラインの手札語彙を取り込んだときに1になる。
 
 ### 3.2 `words`（語）
@@ -193,7 +195,7 @@ erDiagram
 | `improved_count`・`worsened_count`・`same_count` | 語彙更新検証の改善・悪化・同等の件数 | |
 | `outcome` | `applied`（反映した）か `skipped`（見送った） | |
 | `outcome_reason` | 反映した理由、または見送った理由 | |
-| `model`・`prompt_version`・`settings_json` | 使ったモデル、プロンプトの版、その時点の数値の設定 | 後から振る舞いを確かめるため |
+| `model`・`prompt_version`・`settings_json` | 使ったモデル、プロンプトの版、その時点の数値の設定（語彙更新の幅を含む） | 後から振る舞いを確かめるため |
 | `cost_usd` | かかった費用（ドル） | 費用の上限を守れているかを見るため |
 | `error` | 失敗したときの理由 | |
 | `created_at`・`started_at`・`finished_at` | 日時 | |

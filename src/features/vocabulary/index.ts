@@ -22,4 +22,4 @@ export {
   takeNextGenerationSeq,
   type VocabSnapshot,
 } from "./vocab-for-generation";
-export type { LanguageSettings, LanguageState, VocabSizeMode, VocabWord } from "./vocabulary-repository";
+export type { LanguageSettings, LanguageState, VocabSizeMode, VocabUpdateSize, VocabWord } from "./vocabulary-repository";

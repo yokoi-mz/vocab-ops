@@ -5,12 +5,13 @@ import { changeLanguageSettings, listImportedLanguages } from "@/features/vocabu
 const requestBodySchema = z
   .object({
     vocabSizeMode: z.enum(["increase", "keep", "decrease"]),
+    vocabUpdateSize: z.union([z.literal(3), z.literal(4), z.literal(5)]),
     voiceName: z.string().min(1).max(200).nullable(),
     expandedOutsideWordLimit: z.number().int().min(1).max(10),
   })
   .partial();
 
-// 言語の設定（増減モード、読み上げの声、拡張語彙文の手札外語彙の語の数の上限）を変える。送られたものだけを変える。
+// 言語の設定（増減モード、語彙更新の幅、読み上げの声、拡張語彙文の手札外語彙の語の数の上限）を変える。送られたものだけを変える。
 export async function PATCH(request: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   if (!listImportedLanguages().includes(code)) {

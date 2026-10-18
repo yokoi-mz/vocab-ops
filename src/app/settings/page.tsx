@@ -33,6 +33,7 @@ export default async function SettingsPage() {
                 voiceName: status.voiceName,
                 expandedOutsideWordLimit: status.expandedOutsideWordLimit,
                 vocabSizeMode: status.vocabSizeMode,
+                vocabUpdateSize: status.vocabUpdateSize,
               }}
               selectableModes={listSelectableVocabSizeModes(language)}
             />

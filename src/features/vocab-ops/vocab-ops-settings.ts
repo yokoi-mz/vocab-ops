@@ -3,6 +3,7 @@ import type { ProviderRouting } from "@/shared/openrouter";
 // 語彙更新の数値。docs/vocab-ops/parameters.md と同じ値にする。
 // 値を変えたら、parameters.md の「変更履歴」に理由とともに残す。
 // 語彙更新のたびに、この値を記録（vocab_updates.settings_json）に残す。
+// 語彙更新の幅（増やす・減らす語数と、入れ替える語数の上限）は、言語ごとに設定の画面で選ぶ（languages.vocab_update_step）。
 export const vocabOpsSettings = {
   // 語彙更新の実行の間隔（言語ごと、前回の語彙更新から何回の文生成ごとか）
   generationsPerUpdate: 30,
@@ -14,10 +15,6 @@ export const vocabOpsSettings = {
   removalRecentWindow: 60,
   // 削除判定の使用回数のしきい値（直近の集計期間で、この回数以下なら削除候補）
   removalMaxRecentUses: 0,
-  // 1回の語彙更新で増やす・減らす語数（増やす：＋3、減らす：−3）
-  sizeStep: 3,
-  // 1回の語彙更新で入れ替える語数の上限（増やす：−3 ＋6、変えない：−3 ＋3 まで。減らすは入れ替えない）
-  swapLimit: 3,
   // 語彙更新検証に使う履歴：直近の何件から何件、それより前から何件
   validationRecentWindow: 30,
   validationRecentCount: 20,

@@ -120,17 +120,20 @@ async function runVocabUpdate(update: ClaimedVocabUpdate, addCost: (costUsd: num
   const log = (step: VocabUpdateStep, message: string) =>
     recordOpsEvent({ language: update.language, source: "vocab_update", referenceId: update.id, message: `語彙更新 ${update.id}：${message}`, detail: { step } });
 
-  // 1. 増減モードと、今の手札語彙（この語彙更新では、最後までこの手札語彙を元にする）
-  const { vocabSizeMode } = getLanguageStatus(update.language);
+  // 1. 増減モードと語彙更新の幅、今の手札語彙（この語彙更新では、最後までこの手札語彙を元にする）
+  const { vocabSizeMode, vocabUpdateSize } = getLanguageStatus(update.language);
   const snapshot = getVocabSnapshot(update.language);
   setVocabUpdateContext(db, update.id, {
     vocabSizeMode,
     versionBefore: snapshot.version,
     model: vocabOpsModel,
     promptVersion: vocabOpsPromptVersion,
-    settingsJson: JSON.stringify(settings),
+    settingsJson: JSON.stringify({ ...settings, vocabUpdateSize }),
   });
-  log("start", `開始（増減モード ${vocabSizeMode}・手札語彙 版 ${snapshot.version}・${snapshot.activeWords.length} 語）`);
+  log(
+    "start",
+    `開始（増減モード ${vocabSizeMode}・語彙更新の幅 ${vocabUpdateSize}・手札語彙 版 ${snapshot.version}・${snapshot.activeWords.length} 語）`,
+  );
 
   // 2. 追加候補と削除候補
   const additionCandidates = countAdditionCandidates(update.language, settings.additionWindow);
@@ -184,8 +187,7 @@ async function runVocabUpdate(update: ClaimedVocabUpdate, addCost: (costUsd: num
     vocabSizeMode,
     ranking.ranked.map((item) => item.wordId),
     removalCandidates.map((candidate) => candidate.wordId),
-    settings.sizeStep,
-    settings.swapLimit,
+    vocabUpdateSize,
   );
 
   // 候補と更新案を記録する（反映するかどうかにかかわらず）

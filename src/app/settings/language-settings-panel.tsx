@@ -2,11 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { LanguageSettings } from "@/features/vocabulary";
+import type { LanguageSettings, VocabUpdateSize } from "@/features/vocabulary";
 import { Flag } from "@/shared/ui/flag";
 import { listVoices, speak } from "@/shared/ui/speech";
 import styles from "./page.module.css";
 import { VocabSizeModeSwitch } from "./vocab-size-mode-switch";
+
+const vocabUpdateSizes: VocabUpdateSize[] = [3, 4, 5];
 
 type LanguageSettingsPanelProps = {
   language: string;
@@ -110,6 +112,29 @@ export function LanguageSettingsPanel({
         </div>
         <div className={styles.controls}>
           <VocabSizeModeSwitch language={language} current={settings.vocabSizeMode} selectable={selectableModes} />
+        </div>
+      </div>
+
+      <div className={styles.row}>
+        <div className={styles.labelColumn}>
+          <span className={styles.label}>語彙更新の幅</span>
+          <span className={styles.hint}>
+            1回の語彙更新で増やす・減らす語数。入れ替える語数の上限も同じ（例：4 なら、増やすは ＋4 か −4 ＋8）
+          </span>
+        </div>
+        <div className={styles.controls}>
+          <div className="segmented" role="group" aria-label="語彙更新の幅">
+            {vocabUpdateSizes.map((size) => (
+              <button
+                key={size}
+                type="button"
+                aria-pressed={size === settings.vocabUpdateSize}
+                onClick={() => void save({ vocabUpdateSize: size })}
+              >
+                {size} 語
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </section>
