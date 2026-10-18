@@ -31,13 +31,15 @@ export function setActiveVocabVersion(db: DatabaseSync, language: string, versio
 
 const insertedIdSchema = z.object({ id: z.number() });
 
+export type VocabStatus = "active" | "uncounted" | "outside";
+
 export type WordToSave = {
   language: string;
   lemma: string;
   lemmaKey: string;
   meaning: string | null;
   partOfSpeech: string | null;
-  vocabStatus: "active" | "uncounted" | "outside";
+  vocabStatus: VocabStatus;
   addedVersion: number | null;
   addedGenerationSeq: number | null;
 };
@@ -79,4 +81,49 @@ export function insertActiveVocabChange(db: DatabaseSync, change: ActiveVocabCha
     INSERT INTO active_vocab_changes (word_id, language, change, version, generation_seq, source, reason)
     VALUES (:wordId, :language, :change, :version, :generationSeq, :source, :reason)
   `).run(change);
+}
+
+const lemmaKeyRowSchema = z.object({ lemma_key: z.string() });
+
+export function listActiveLemmaKeys(db: DatabaseSync, language: string): Set<string> {
+  const rows = db.prepare("SELECT lemma_key FROM words WHERE language = ? AND vocab_status = 'active'").all(language);
+  return new Set(rows.map((row) => lemmaKeyRowSchema.parse(row).lemma_key));
+}
+
+const languageCodeRowSchema = z.object({ code: z.string() });
+
+export function listLanguageCodes(db: DatabaseSync): string[] {
+  const rows = db.prepare("SELECT code FROM languages ORDER BY code").all();
+  return rows.map((row) => languageCodeRowSchema.parse(row).code);
+}
+
+const wordRowSchema = z.object({
+  id: z.number(),
+  lemma: z.string(),
+  meaning: z.string().nullable(),
+  part_of_speech: z.string().nullable(),
+});
+
+export type VocabWord = {
+  id: number;
+  lemma: string;
+  meaning: string | null;
+  partOfSpeech: string | null;
+};
+
+export function listWordsByStatus(db: DatabaseSync, language: string, vocabStatus: VocabStatus): VocabWord[] {
+  const rows = db.prepare(`
+    SELECT id, lemma, meaning, part_of_speech FROM words
+    WHERE language = ? AND vocab_status = ?
+    ORDER BY id
+  `).all(language, vocabStatus);
+  return rows.map((row) => {
+    const word = wordRowSchema.parse(row);
+    return {
+      id: word.id,
+      lemma: word.lemma,
+      meaning: word.meaning,
+      partOfSpeech: word.part_of_speech,
+    };
+  });
 }
