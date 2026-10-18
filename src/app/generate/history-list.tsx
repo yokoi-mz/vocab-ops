@@ -12,15 +12,18 @@ type HistoryListProps = {
   language: string;
   languageName: string;
   speechLang: string;
+  voiceName: string | null;
   showSpeaker: boolean;
   // 上に表示している文生成。履歴の一覧では重ねて出さない
   excludedId: number | null;
   // 文生成が完成するたびに増える。増えたら一覧を読み直す
   refreshKey: number;
+  // 一覧の最初のページを読んだときに呼ぶ（新しい順の文生成を渡す）
+  onLoaded: (generations: GenerationDetail[]) => void;
 };
 
 // その言語の文生成の履歴。新しい順に並べ、行を押すと2枚のカードを開く。
-export function HistoryList({ language, languageName, speechLang, showSpeaker, excludedId, refreshKey }: HistoryListProps) {
+export function HistoryList({ language, languageName, speechLang, voiceName, showSpeaker, excludedId, refreshKey, onLoaded }: HistoryListProps) {
   const [generations, setGenerations] = useState<GenerationDetail[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const [openId, setOpenId] = useState<number | null>(null);
@@ -31,11 +34,14 @@ export function HistoryList({ language, languageName, speechLang, showSpeaker, e
       if (!stopped) {
         setGenerations(items);
         setHasMore(items.length === pageSize);
+        onLoaded(items);
       }
     });
     return () => {
       stopped = true;
     };
+    // onLoaded は、言語か refreshKey が変わって読み直したときだけ呼べばよい
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language, refreshKey]);
 
   async function loadMore() {
@@ -78,6 +84,7 @@ export function HistoryList({ language, languageName, speechLang, showSpeaker, e
                   generation={generation}
                   languageName={languageName}
                   speechLang={speechLang}
+                  voiceName={voiceName}
                   showSpeaker={showSpeaker}
                   onDeleted={() => setGenerations(generations.filter((item) => item.id !== generation.id))}
                 />

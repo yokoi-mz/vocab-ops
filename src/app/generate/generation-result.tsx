@@ -10,6 +10,7 @@ type GenerationResultProps = {
   generation: GenerationDetail;
   languageName: string;
   speechLang: string;
+  voiceName: string | null;
   // 話し手の性別で語形が変わる言語のときだけ、女性形・男性形を表示する
   showSpeaker: boolean;
   // 削除されたあとに呼ぶ。渡されたときだけ「この回を削除」ボタンを出す
@@ -17,7 +18,7 @@ type GenerationResultProps = {
 };
 
 // 1回の文生成の結果（言いたいことと、手札語彙文・拡張語彙文の2枚のカード）。文生成の画面と履歴の画面で使う。
-export function GenerationResult({ generation, languageName, speechLang, showSpeaker, onDeleted }: GenerationResultProps) {
+export function GenerationResult({ generation, languageName, speechLang, voiceName, showSpeaker, onDeleted }: GenerationResultProps) {
   const currentSet = generation.sentences.find((sentence) => sentence.sentenceType === "current_set");
   const expandedSet = generation.sentences.find((sentence) => sentence.sentenceType === "expanded_set");
   const isWaiting = generation.status === "pending" || generation.status === "running";
@@ -47,6 +48,7 @@ export function GenerationResult({ generation, languageName, speechLang, showSpe
             outsideWordLimit={0}
             sentence={currentSet}
             speechLang={speechLang}
+            voiceName={voiceName}
           />
         )}
         {expandedSet !== undefined && (
@@ -57,6 +59,7 @@ export function GenerationResult({ generation, languageName, speechLang, showSpe
             outsideWordLimit={generation.expandedOutsideWordLimit ?? 0}
             sentence={expandedSet}
             speechLang={speechLang}
+            voiceName={voiceName}
           />
         )}
       </div>

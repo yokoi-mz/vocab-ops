@@ -1,6 +1,5 @@
 export {
   applyVocabUpdate,
-  changeVocabSizeMode,
   getLanguageStatus,
   recordVocabUpdateStart,
   type ApplyVocabUpdateResult,
@@ -8,6 +7,7 @@ export {
 } from "./apply-vocab-update";
 export { getVocabulary, getWordsByIds, listImportedLanguages, type Vocabulary } from "./get-vocabulary";
 export { importBaseline } from "./import-baseline";
+export { changeLanguageSettings } from "./language-settings";
 export {
   createVocabSnapshot,
   getVocabSnapshot,
@@ -15,4 +15,4 @@ export {
   takeNextGenerationSeq,
   type VocabSnapshot,
 } from "./vocab-for-generation";
-export type { LanguageState, VocabSizeMode, VocabWord } from "./vocabulary-repository";
+export type { LanguageSettings, LanguageState, VocabSizeMode, VocabWord } from "./vocabulary-repository";

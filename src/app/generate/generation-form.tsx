@@ -13,6 +13,8 @@ export type LanguageOption = {
   code: string;
   name: string;
   speechLang: string;
+  // 設定の画面で選んだ読み上げの声。null なら自動
+  voiceName: string | null;
   hasSpeakerGender: boolean;
 };
 
@@ -27,21 +29,40 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
   const [situation, setSituation] = useState("");
   const [message, setMessage] = useState("");
   const [speaker, setSpeaker] = useState<Speaker>("female");
-  const [generationId, setGenerationId] = useState<number | null>(initialGenerationId);
+  // 言語ごとに、上の2つのブロックに出す文生成の番号。
+  // まだ決まっていない言語（undefined）では、履歴を読んだときに、いちばん新しいものを出す
+  const [shownIds, setShownIds] = useState<Record<string, number | null>>({});
   const [generation, setGeneration] = useState<GenerationDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
-  const isWaiting = generationId !== null && (generation === null || generation.status === "pending" || generation.status === "running");
+  const shownId = shownIds[language] ?? null;
+  const shownGeneration = generation !== null && generation.id === shownId ? generation : null;
+  const isWaiting = shownId !== null && (shownGeneration === null || shownGeneration.status === "pending" || shownGeneration.status === "running");
 
-  // 依頼を送ったら、完了か失敗になるまで数秒おきに結果を問い合わせる
+  // URL の ?id= で開いたときは、その文生成の言語に切り替えて、その文生成を出す
   useEffect(() => {
-    if (generationId === null) {
+    if (initialGenerationId === null) {
+      return;
+    }
+    void fetch(`/api/generations/${initialGenerationId}`).then(async (response) => {
+      if (response.ok) {
+        const detail: GenerationDetail = await response.json();
+        setLanguage(detail.language);
+        setShownIds((ids) => ({ ...ids, [detail.language]: detail.id }));
+      }
+    });
+  }, [initialGenerationId]);
+
+  // 出す文生成を読む。作成中なら、完了か失敗になるまで数秒おきに問い合わせる
+  useEffect(() => {
+    window.history.replaceState(null, "", shownId === null ? "/generate" : `/generate?id=${shownId}`);
+    if (shownId === null) {
       return;
     }
     let stopped = false;
     const poll = async () => {
-      const response = await fetch(`/api/generations/${generationId}`);
+      const response = await fetch(`/api/generations/${shownId}`);
       if (stopped || !response.ok) {
         return;
       }
@@ -57,7 +78,12 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
     return () => {
       stopped = true;
     };
-  }, [generationId]);
+  }, [shownId]);
+
+  // 履歴を読んだとき、まだ出すものが決まっていない言語なら、いちばん新しい文生成を出す
+  function showLatestIfUndecided(items: GenerationDetail[]) {
+    setShownIds((ids) => (language in ids || items.length === 0 ? ids : { ...ids, [language]: items[0].id }));
+  }
 
   async function submit(event?: FormEvent) {
     event?.preventDefault();
@@ -65,7 +91,6 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
       return;
     }
     setError(null);
-    setGeneration(null);
     const response = await fetch("/api/generations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -76,8 +101,7 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
       setError(body.error ?? "依頼を送れませんでした。");
       return;
     }
-    setGenerationId(body.id);
-    window.history.replaceState(null, "", `/generate?id=${body.id}`);
+    setShownIds((ids) => ({ ...ids, [language]: body.id }));
   }
 
   function submitWithShortcut(event: KeyboardEvent) {
@@ -86,7 +110,7 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
     }
   }
 
-  const selected = languages.find((option) => option.code === (generation?.language ?? language));
+  const selected = languages.find((option) => option.code === language);
 
   return (
     <>
@@ -144,16 +168,21 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
         {error !== null && <p className={styles.warning}>{error}</p>}
       </form>
 
-      {generation !== null && (
+      {shownGeneration !== null && (
         <GenerationResult
-          generation={generation}
+          generation={shownGeneration}
           languageName={selected?.name ?? ""}
           speechLang={selected?.speechLang ?? ""}
+          voiceName={selected?.voiceName ?? null}
           showSpeaker={selected?.hasSpeakerGender ?? true}
           onDeleted={() => {
-            setGenerationId(null);
-            setGeneration(null);
-            window.history.replaceState(null, "", "/generate");
+            // 消したら、残っている中でいちばん新しいものを出し直す
+            setShownIds((ids) => {
+              const rest = { ...ids };
+              delete rest[language];
+              return rest;
+            });
+            setHistoryRefreshKey((key) => key + 1);
           }}
         />
       )}
@@ -162,9 +191,11 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
         language={language}
         languageName={languages.find((option) => option.code === language)?.name ?? ""}
         speechLang={languages.find((option) => option.code === language)?.speechLang ?? ""}
+        voiceName={languages.find((option) => option.code === language)?.voiceName ?? null}
         showSpeaker={languages.find((option) => option.code === language)?.hasSpeakerGender ?? true}
-        excludedId={generation?.language === language ? generation.id : null}
+        excludedId={shownId}
         refreshKey={historyRefreshKey}
+        onLoaded={showLatestIfUndecided}
       />
     </>
   );

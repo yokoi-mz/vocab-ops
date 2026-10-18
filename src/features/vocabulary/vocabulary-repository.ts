@@ -2,6 +2,7 @@ import type { DatabaseSync } from "node:sqlite";
 import { z } from "zod";
 
 const languageRowSchema = z.object({
+  voice_name: z.string().nullable(),
   vocab_size_mode: z.enum(["increase", "keep", "decrease"]),
   expanded_outside_word_limit: z.number(),
   active_vocab_version: z.number(),
@@ -12,6 +13,8 @@ const languageRowSchema = z.object({
 export type VocabSizeMode = "increase" | "keep" | "decrease";
 
 export type LanguageState = {
+  // 読み上げに使う声の名前。null なら自動で選ぶ
+  voiceName: string | null;
   vocabSizeMode: VocabSizeMode;
   expandedOutsideWordLimit: number;
   activeVocabVersion: number;
@@ -26,11 +29,12 @@ export function insertLanguageIfMissing(db: DatabaseSync, language: string): voi
 export function getLanguageState(db: DatabaseSync, language: string): LanguageState {
   const row = languageRowSchema.parse(
     db.prepare(`
-      SELECT vocab_size_mode, expanded_outside_word_limit, active_vocab_version, last_generation_seq, last_vocab_update_seq
+      SELECT voice_name, vocab_size_mode, expanded_outside_word_limit, active_vocab_version, last_generation_seq, last_vocab_update_seq
       FROM languages WHERE code = ?
     `).get(language),
   );
   return {
+    voiceName: row.voice_name,
     vocabSizeMode: row.vocab_size_mode,
     expandedOutsideWordLimit: row.expanded_outside_word_limit,
     activeVocabVersion: row.active_vocab_version,
@@ -127,8 +131,24 @@ export function moveWordToOutside(db: DatabaseSync, wordId: number): boolean {
   return result.changes === 1;
 }
 
-export function setVocabSizeMode(db: DatabaseSync, language: string, mode: VocabSizeMode): void {
-  db.prepare("UPDATE languages SET vocab_size_mode = ? WHERE code = ?").run(mode, language);
+export type LanguageSettings = {
+  voiceName: string | null;
+  vocabSizeMode: VocabSizeMode;
+  expandedOutsideWordLimit: number;
+};
+
+// 言語の設定のうち、渡されたものだけを書き換える。
+export function updateLanguageSettings(db: DatabaseSync, language: string, settings: Partial<LanguageSettings>): void {
+  const columns: [keyof LanguageSettings, string][] = [
+    ["voiceName", "voice_name"],
+    ["vocabSizeMode", "vocab_size_mode"],
+    ["expandedOutsideWordLimit", "expanded_outside_word_limit"],
+  ];
+  for (const [key, column] of columns) {
+    if (settings[key] !== undefined) {
+      db.prepare(`UPDATE languages SET ${column} = ? WHERE code = ?`).run(settings[key], language);
+    }
+  }
 }
 
 // 語彙更新を始めたことを記録する。その時点の文生成の通し番号を返す。

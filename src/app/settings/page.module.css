@@ -1,0 +1,82 @@
+.panels {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel {
+  padding: 18px 22px;
+}
+
+.languageName {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  padding: 12px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.labelColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-weight: 700;
+}
+
+.hint {
+  color: var(--color-text-faint);
+  font-size: 13px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.select {
+  width: auto;
+  min-width: 240px;
+  max-width: 100%;
+}
+
+.smallButton {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.smallButton:hover:not(:disabled) {
+  border-color: var(--color-sky);
+  color: var(--color-text);
+}
+
+.smallButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.number {
+  min-width: 70px;
+  color: var(--color-mint);
+  font-weight: 700;
+  text-align: center;
+}

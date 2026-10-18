@@ -4,12 +4,11 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import type { CSSProperties } from "react";
 import { getLanguageName } from "@/features/language";
-import { countGenerationsUntilNextUpdate, listRecentVocabUpdates, selectableVocabSizeModes } from "@/features/vocab-ops";
+import { countGenerationsUntilNextUpdate, listRecentVocabUpdates } from "@/features/vocab-ops";
 import { getLanguageStatus, getVocabulary, listImportedLanguages, type VocabWord } from "@/features/vocabulary";
 import { Flag } from "@/shared/ui/flag";
 import styles from "./page.module.css";
 import { RecentUpdates } from "./recent-updates";
-import { VocabSizeModeSwitch } from "./vocab-size-mode-switch";
 
 type VocabularyPageProps = {
   params: Promise<{ language: string }>;
@@ -55,7 +54,10 @@ export default async function VocabularyPage({ params }: VocabularyPageProps) {
 
       <div className={`panel ${styles.opsRow}`}>
         <span className={styles.opsLabel}>増減モード</span>
-        <VocabSizeModeSwitch language={language} current={status.vocabSizeMode} selectable={selectableVocabSizeModes} />
+        <span className={styles.opsMode}>{vocabSizeModeLabels[status.vocabSizeMode]}</span>
+        <Link href="/settings" className={styles.opsLink}>
+          設定で変える
+        </Link>
         <span className={styles.opsNext}>
           次の語彙更新まで、あと <strong>{generationsUntilNextUpdate}</strong> 回の文生成
         </span>
@@ -111,6 +113,8 @@ export default async function VocabularyPage({ params }: VocabularyPageProps) {
     </main>
   );
 }
+
+const vocabSizeModeLabels = { increase: "増やす", keep: "変えない", decrease: "減らす" } as const;
 
 function groupByPartOfSpeech(words: VocabWord[]): [string, VocabWord[]][] {
   const groups = new Map<string, VocabWord[]>();

@@ -6,9 +6,7 @@ import {
   moveWordToActive,
   moveWordToOutside,
   setActiveVocabVersion,
-  setVocabSizeMode,
   type LanguageState,
-  type VocabSizeMode,
 } from "./vocabulary-repository";
 
 export type VocabChangeRequest = {
@@ -72,10 +70,6 @@ export function applyVocabUpdate(
 
 export function getLanguageStatus(language: string): LanguageState {
   return getLanguageState(getDatabase(), language);
-}
-
-export function changeVocabSizeMode(language: string, mode: VocabSizeMode): void {
-  setVocabSizeMode(getDatabase(), language, mode);
 }
 
 // 語彙更新を始めたことを記録し、その時点の文生成の通し番号を返す。

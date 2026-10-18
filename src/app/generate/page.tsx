@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getLanguageName, getLanguageRules } from "@/features/language";
-import { listImportedLanguages } from "@/features/vocabulary";
+import { getLanguageStatus, listImportedLanguages } from "@/features/vocabulary";
 import { GenerationForm } from "./generation-form";
 
 export const metadata: Metadata = {
@@ -15,6 +15,7 @@ export default async function GeneratePage({ searchParams }: { searchParams: Pro
     code,
     name: getLanguageName(code),
     speechLang: getLanguageRules(code).speechLang,
+    voiceName: getLanguageStatus(code).voiceName,
     hasSpeakerGender: getLanguageRules(code).hasSpeakerGender,
   }));
 

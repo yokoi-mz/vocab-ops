@@ -3,6 +3,8 @@ export type LanguageRules = {
   englishName: string;
   // 読み上げに使う言語と地域（ブラウザの音声合成に渡す）
   speechLang: string;
+  // 設定の画面で、声を試しに聞くときの文
+  speechSample: string;
   // 話し手の性別で、自分について言うときの語形が変わる言語か（je suis fatiguée など）。
   // 変わらない言語では、画面で女性形・男性形を選ばせず、プロンプトにも書かない
   hasSpeakerGender: boolean;
@@ -29,6 +31,7 @@ export type LanguageRules = {
 const defaultRules: LanguageRules = {
   englishName: "",
   speechLang: "",
+  speechSample: "",
   hasSpeakerGender: true,
   grammarChecks: "auxiliaries, agreement, prepositions, word order.",
   tokenRules: [],
@@ -44,6 +47,7 @@ const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
   en: {
     englishName: "English",
     speechLang: "en-GB",
+    speechSample: "Nice to meet you. How are you today?",
     hasSpeakerGender: false,
     grammarChecks:
       "Tense consistency (past simple vs present perfect). Third person -s. Articles (a / an / the). Prepositions of time and place (in / on / at). Question word order with do / does / did.",
@@ -76,6 +80,7 @@ const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
   fr: {
     englishName: "French",
     speechLang: "fr-FR",
+    speechSample: "Enchanté. Comment allez-vous aujourd'hui ?",
     grammarChecks:
       "passé composé auxiliary: être for movement/state verbs (aller, venir, rester, partir, arriver, sortir, entrer, naître, mourir, tomber, retourner) and all pronominal verbs → je suis resté, je suis allé, je me suis souvenu; avoir otherwise. Past participle agreement with être. Country prepositions: en Italie / au Japon / aux États-Unis. Negation ne ... pas. Elision (j', l', qu').",
     tokenRules: ['Elided forms: "J\'" → lemma "je", "l\'" → "le", "d\'" → "de", "qu\'" → "que".'],
@@ -86,6 +91,7 @@ const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
   it: {
     englishName: "Italian",
     speechLang: "it-IT",
+    speechSample: "Piacere di conoscerti. Come stai oggi?",
     grammarChecks:
       "passato prossimo auxiliary: essere for movement/state verbs (andare, venire, stare, essere, restare, tornare, partire, uscire) and reflexive verbs, with participle agreement → sono andato/a; avere otherwise. Article + possessive (il mio amico). Articulated prepositions (nel, alla, dal). piacere construction (mi piace).",
     tokenRules: ['Elided forms: "l\'" → lemma "il" or "lo", "un\'" → "uno", "c\'" → "ci".'],
@@ -105,6 +111,7 @@ const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
   es: {
     englishName: "Spanish",
     speechLang: "es-ES",
+    speechSample: "Encantado de conocerte. ¿Cómo estás hoy?",
     grammarChecks:
       "ser vs estar. gustar / encantar construction (me gusta). Preterite vs imperfect used appropriately. Personal a before people. Adjective agreement.",
     removablePrefixes: ["se "],
@@ -118,6 +125,7 @@ const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
   de: {
     englishName: "German",
     speechLang: "de-DE",
+    speechSample: "Freut mich, dich kennenzulernen. Wie geht es dir heute?",
     grammarChecks:
       "Verb-second word order in main clauses, verb-final in subordinate clauses (weil, dass, wenn). Perfekt auxiliary: sein for movement/state change (gehen, fahren, kommen, bleiben), haben otherwise. Separable verbs. Cases after prepositions and articles. Noun capitalization.",
     tokenRules: ["German separable verbs: give the separated particle token the same lemma as the verb."],
@@ -132,6 +140,7 @@ const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
   sv: {
     englishName: "Swedish",
     speechLang: "sv-SE",
+    speechSample: "Trevligt att träffas. Hur mår du i dag?",
     hasSpeakerGender: false,
     grammarChecks:
       "Verb-second word order in main clauses. Definite forms (suffixed articles: huset, bilen). en/ett gender agreement. Adjective agreement (stor / stort / stora).",

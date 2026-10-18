@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import type { GeneratedSentence, GeneratedToken } from "@/features/generation";
+import { speak } from "@/shared/ui/speech";
 import { segmentSentence } from "./segment-sentence";
 import styles from "./generate.module.css";
 
@@ -25,9 +26,10 @@ type SentenceCardProps = {
   outsideWordLimit: number;
   sentence: GeneratedSentence;
   speechLang: string;
+  voiceName: string | null;
 };
 
-export function SentenceCard({ title, subtitle, color, outsideWordLimit, sentence, speechLang }: SentenceCardProps) {
+export function SentenceCard({ title, subtitle, color, outsideWordLimit, sentence, speechLang, voiceName }: SentenceCardProps) {
   const problems: { type: string }[] =
     sentence.unresolvedProblemsJson === null ? [] : JSON.parse(sentence.unresolvedProblemsJson);
   const outsideCount = new Set(
@@ -52,7 +54,7 @@ export function SentenceCard({ title, subtitle, color, outsideWordLimit, sentenc
       <div>
         <div className={styles.labelRow}>
           <span className="label">文</span>
-          <button type="button" className={styles.iconButton} onClick={() => speak(sentence.sentence, speechLang)} aria-label="読み上げる">
+          <button type="button" className={styles.iconButton} onClick={() => speak(sentence.sentence, speechLang, voiceName)} aria-label="読み上げる">
             ▶︎
           </button>
         </div>
@@ -88,7 +90,7 @@ export function SentenceCard({ title, subtitle, color, outsideWordLimit, sentenc
             {groupTokens(sentence.tokens).map((group) => (
               <tr key={`${group.lemma}-${group.judgement}`}>
                 <td>
-                  <button type="button" className={styles.wordButton} onClick={() => speak(group.lemma, speechLang)}>
+                  <button type="button" className={styles.wordButton} onClick={() => speak(group.lemma, speechLang, voiceName)}>
                     {group.lemma}
                   </button>
                 </td>
@@ -119,16 +121,4 @@ function groupTokens(tokens: GeneratedToken[]) {
     }
   }
   return [...groups.values()];
-}
-
-function speak(text: string, lang: string): void {
-  speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang;
-  utterance.rate = 0.95;
-  const voice = speechSynthesis.getVoices().find((candidate) => candidate.lang === lang);
-  if (voice !== undefined) {
-    utterance.voice = voice;
-  }
-  speechSynthesis.speak(utterance);
 }
