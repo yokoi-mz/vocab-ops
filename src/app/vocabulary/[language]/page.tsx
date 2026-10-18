@@ -3,10 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import type { CSSProperties } from "react";
-import { getLanguageName } from "@/features/language";
+import { getLanguageName, getLanguageRules } from "@/features/language";
 import { countGenerationsUntilNextUpdate, listRecentVocabUpdates } from "@/features/vocab-ops";
 import { getLanguageStatus, getVocabulary, listImportedLanguages, type VocabWord } from "@/features/vocabulary";
 import { Flag } from "@/shared/ui/flag";
+import { SpeakableWord } from "@/shared/ui/speakable-word";
 import styles from "./page.module.css";
 import { RecentUpdates } from "./recent-updates";
 
@@ -29,6 +30,7 @@ export default async function VocabularyPage({ params }: VocabularyPageProps) {
 
   const { activeVocab, uncountedVocab } = getVocabulary(language);
   const status = getLanguageStatus(language);
+  const speech = { lang: getLanguageRules(language).speechLang, voiceName: status.voiceName };
   const generationsUntilNextUpdate = countGenerationsUntilNextUpdate(language);
   const recentUpdates = listRecentVocabUpdates(language, 5);
   // 最近の語彙更新で足した語（今の版で手札語彙に入った語）に印を付ける。ベースライン（版1）の語には付けない
@@ -84,7 +86,9 @@ export default async function VocabularyPage({ params }: VocabularyPageProps) {
                 {words.map((word) => (
                   <tr key={word.id}>
                     <td className={styles.lemma}>
-                      {word.lemma}
+                      <SpeakableWord text={word.lemma} lang={speech.lang} voiceName={speech.voiceName}>
+                        {word.lemma}
+                      </SpeakableWord>
                       {isNew(word) && <span className={styles.newBadge}>NEW</span>}
                     </td>
                     <td className={styles.meaning}>{word.meaning}</td>
@@ -104,7 +108,16 @@ export default async function VocabularyPage({ params }: VocabularyPageProps) {
             {groupByPartOfSpeech(uncountedVocab).map(([kind, words]) => (
               <tr key={kind}>
                 <td className={styles.kind}>{kind}</td>
-                <td className={styles.lemma}>{words.map((word) => word.lemma).join(", ")}</td>
+                <td className={styles.lemma}>
+                  {words.map((word, index) => (
+                    <span key={word.id}>
+                      {index > 0 && ", "}
+                      <SpeakableWord text={word.lemma} lang={speech.lang} voiceName={speech.voiceName}>
+                        {word.lemma}
+                      </SpeakableWord>
+                    </span>
+                  ))}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import type { GeneratedSentence, GeneratedToken } from "@/features/generation";
+import { SpeakableWord } from "@/shared/ui/speakable-word";
 import { speak } from "@/shared/ui/speech";
 import { segmentSentence } from "./segment-sentence";
 import styles from "./generate.module.css";
@@ -59,15 +60,23 @@ export function SentenceCard({ title, subtitle, color, outsideWordLimit, sentenc
           </button>
         </div>
         <p className={styles.sentence} lang={speechLang}>
-          {segmentSentence(sentence.sentence, sentence.tokens).map((segment, index) => (
-            <span
-              key={index}
-              className={segment.token?.judgement === "outside" ? styles.outsideWord : undefined}
-              title={segment.token ? `${segment.token.lemma}：${segment.token.meaning ?? ""}` : undefined}
-            >
-              {segment.text}
-            </span>
-          ))}
+          {segmentSentence(sentence.sentence, sentence.tokens).map((segment, index) =>
+            segment.token === null ? (
+              <span key={index}>{segment.text}</span>
+            ) : (
+              // 単語を押すと、文の中の形のまま読み上げる
+              <SpeakableWord
+                key={index}
+                text={segment.text}
+                lang={speechLang}
+                voiceName={voiceName}
+                className={segment.token.judgement === "outside" ? styles.outsideWord : undefined}
+                title={`${segment.token.lemma}：${segment.token.meaning ?? ""}`}
+              >
+                {segment.text}
+              </SpeakableWord>
+            ),
+          )}
         </p>
       </div>
 
