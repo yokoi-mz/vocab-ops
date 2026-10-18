@@ -12,10 +12,12 @@ type GenerationResultProps = {
   speechLang: string;
   // 話し手の性別で語形が変わる言語のときだけ、女性形・男性形を表示する
   showSpeaker: boolean;
+  // 削除されたあとに呼ぶ。渡されたときだけ「この回を削除」ボタンを出す
+  onDeleted?: () => void;
 };
 
 // 1回の文生成の結果（言いたいことと、手札語彙文・拡張語彙文の2枚のカード）。文生成の画面と履歴の画面で使う。
-export function GenerationResult({ generation, languageName, speechLang, showSpeaker }: GenerationResultProps) {
+export function GenerationResult({ generation, languageName, speechLang, showSpeaker, onDeleted }: GenerationResultProps) {
   const currentSet = generation.sentences.find((sentence) => sentence.sentenceType === "current_set");
   const expandedSet = generation.sentences.find((sentence) => sentence.sentenceType === "expanded_set");
   const isWaiting = generation.status === "pending" || generation.status === "running";
@@ -58,6 +60,27 @@ export function GenerationResult({ generation, languageName, speechLang, showSpe
           />
         )}
       </div>
+      {onDeleted !== undefined && !isWaiting && (
+        <div className={styles.deleteRow}>
+          <button type="button" className={styles.deleteButton} onClick={() => void deleteGeneration(generation.id, onDeleted)}>
+            この回を削除
+          </button>
+        </div>
+      )}
     </div>
   );
+}
+
+// 確認してから、文生成1回分を削除する（語彙更新の回数にも数えなくなる）。
+async function deleteGeneration(id: number, onDeleted: () => void): Promise<void> {
+  if (!window.confirm("この回の文生成を削除します。語彙更新の回数にも数えなくなり、元に戻せません。よろしいですか？")) {
+    return;
+  }
+  const response = await fetch(`/api/generations/${id}`, { method: "DELETE" });
+  if (response.ok) {
+    onDeleted();
+  } else {
+    const body = await response.json().catch(() => ({}));
+    window.alert(body.error ?? "削除できませんでした。");
+  }
 }

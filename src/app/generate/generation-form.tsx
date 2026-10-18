@@ -150,6 +150,11 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
           languageName={selected?.name ?? ""}
           speechLang={selected?.speechLang ?? ""}
           showSpeaker={selected?.hasSpeakerGender ?? true}
+          onDeleted={() => {
+            setGenerationId(null);
+            setGeneration(null);
+            window.history.replaceState(null, "", "/generate");
+          }}
         />
       )}
 

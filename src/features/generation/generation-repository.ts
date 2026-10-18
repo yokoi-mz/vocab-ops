@@ -126,6 +126,18 @@ export function failGeneration(db: DatabaseSync, id: number, error: string, cost
   );
 }
 
+// ---- 消す ----
+
+// 文生成1回分の単語・文・記録を消す。呼ぶ側でトランザクションを張る。
+export function deleteGenerationRows(db: DatabaseSync, id: number): void {
+  db.prepare(`
+    DELETE FROM generation_tokens
+    WHERE sentence_id IN (SELECT id FROM generation_sentences WHERE generation_id = ?)
+  `).run(id);
+  db.prepare("DELETE FROM generation_sentences WHERE generation_id = ?").run(id);
+  db.prepare("DELETE FROM generations WHERE id = ?").run(id);
+}
+
 // ---- 読む ----
 
 const generationRowSchema = z.object({

@@ -287,3 +287,24 @@
 .moreButton:hover {
   color: var(--color-text);
 }
+
+.deleteRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.deleteButton {
+  padding: 4px 14px;
+  border: 1px solid rgb(255 107 107 / 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-outside);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  background: rgb(255 107 107 / 0.1);
+}

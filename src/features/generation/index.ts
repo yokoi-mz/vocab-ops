@@ -1,3 +1,4 @@
+export { deleteGeneration, type DeleteGenerationResult } from "./delete-generation";
 export {
   recoverInterruptedGenerations,
   requestGeneration,

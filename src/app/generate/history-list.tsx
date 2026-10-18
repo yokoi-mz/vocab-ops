@@ -74,7 +74,13 @@ export function HistoryList({ language, languageName, speechLang, showSpeaker, e
             </button>
             {openId === generation.id && (
               <div className={styles.historyDetail}>
-                <GenerationResult generation={generation} languageName={languageName} speechLang={speechLang} showSpeaker={showSpeaker} />
+                <GenerationResult
+                  generation={generation}
+                  languageName={languageName}
+                  speechLang={speechLang}
+                  showSpeaker={showSpeaker}
+                  onDeleted={() => setGenerations(generations.filter((item) => item.id !== generation.id))}
+                />
               </div>
             )}
           </li>
