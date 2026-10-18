@@ -2,7 +2,7 @@ import { getLanguageRules, type SentenceProblem } from "@/features/language";
 import type { SentenceType, Speaker } from "./generation-repository";
 
 // プロンプトを変えたら、この版を進める。文生成の記録に残し、語彙更新検証で保存済みの文を使い回せるかの判断に使う。
-export const promptVersion = "2026-10-18.1";
+export const promptVersion = "2026-10-18.2";
 
 export const systemPrompt = `You are a speaking-simulation engine for a language learner.
 The learner may only use a limited set of lemmas. Your job is to express what they want to say
@@ -102,9 +102,7 @@ ${tokenRules}
 == THIS REQUEST ==
 ${goal(input.sentenceType, budget)}
 NEW lemma budget: ${budget}. Do not exceed it.
-
-SPEAKER: ${speakerRules[input.speaker]}
-
+${rules.hasSpeakerGender ? `\nSPEAKER: ${speakerRules[input.speaker]}\n` : ""}
 SITUATION (may be empty): ${input.situation || "(none)"}
 
 WHAT THE LEARNER WANTS TO SAY (usually Japanese):

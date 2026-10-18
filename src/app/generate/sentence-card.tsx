@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import type { GeneratedSentence, GeneratedToken } from "@/features/generation";
 import { segmentSentence } from "./segment-sentence";
 import styles from "./generate.module.css";
@@ -19,11 +20,14 @@ const problemLabels: Record<string, string> = {
 
 type SentenceCardProps = {
   title: string;
+  subtitle: string;
+  color: string;
+  outsideWordLimit: number;
   sentence: GeneratedSentence;
   speechLang: string;
 };
 
-export function SentenceCard({ title, sentence, speechLang }: SentenceCardProps) {
+export function SentenceCard({ title, subtitle, color, outsideWordLimit, sentence, speechLang }: SentenceCardProps) {
   const problems: { type: string }[] =
     sentence.unresolvedProblemsJson === null ? [] : JSON.parse(sentence.unresolvedProblemsJson);
   const outsideCount = new Set(
@@ -31,28 +35,39 @@ export function SentenceCard({ title, sentence, speechLang }: SentenceCardProps)
   ).size;
 
   return (
-    <section className={styles.card}>
+    <section className={`panel ${styles.card}`} style={{ "--card-color": color } as CSSProperties}>
       <header className={styles.cardHeader}>
-        <h2 className={styles.cardTitle}>{title}</h2>
-        <span className={styles.muted}>
-          手札外語彙 {outsideCount} 語{sentence.attempts > 1 ? `・${sentence.attempts} 回目で完成` : ""}
+        <div>
+          <h2 className={styles.cardTitle}>{title}</h2>
+          <p className={styles.cardSubtitle}>
+            {subtitle}
+            {sentence.attempts > 1 ? `・${sentence.attempts} 回目で完成` : ""}
+          </p>
+        </div>
+        <span className={`${styles.badge} ${outsideCount > 0 ? styles.badgeOutside : ""}`}>
+          手札外 {outsideCount} / {outsideWordLimit}
         </span>
       </header>
 
-      <p className={styles.sentence} lang={speechLang}>
-        {segmentSentence(sentence.sentence, sentence.tokens).map((segment, index) => (
-          <span
-            key={index}
-            className={segment.token?.judgement === "outside" ? styles.outsideWord : undefined}
-            title={segment.token ? `${segment.token.lemma}：${segment.token.meaning ?? ""}` : undefined}
-          >
-            {segment.text}
-          </span>
-        ))}
-        <button type="button" className={styles.speakButton} onClick={() => speak(sentence.sentence, speechLang)} aria-label="読み上げる">
-          ▶︎
-        </button>
-      </p>
+      <div>
+        <div className={styles.labelRow}>
+          <span className="label">文</span>
+          <button type="button" className={styles.iconButton} onClick={() => speak(sentence.sentence, speechLang)} aria-label="読み上げる">
+            ▶︎
+          </button>
+        </div>
+        <p className={styles.sentence} lang={speechLang}>
+          {segmentSentence(sentence.sentence, sentence.tokens).map((segment, index) => (
+            <span
+              key={index}
+              className={segment.token?.judgement === "outside" ? styles.outsideWord : undefined}
+              title={segment.token ? `${segment.token.lemma}：${segment.token.meaning ?? ""}` : undefined}
+            >
+              {segment.text}
+            </span>
+          ))}
+        </p>
+      </div>
 
       {problems.length > 0 && (
         <p className={styles.warning}>
@@ -60,15 +75,14 @@ export function SentenceCard({ title, sentence, speechLang }: SentenceCardProps)
         </p>
       )}
 
-      <dl className={styles.details}>
-        <dt>実際の意味</dt>
-        <dd>{sentence.translation}</dd>
-        <dt>コメント</dt>
-        <dd>{sentence.comment}</dd>
-      </dl>
+      <div>
+        <span className="label">実際の意味</span>
+        <p className={styles.box}>{sentence.translation}</p>
+        <p className={styles.comment}>{sentence.comment}</p>
+      </div>
 
       <details>
-        <summary className={styles.muted}>単語の内訳</summary>
+        <summary className="label">単語の内訳</summary>
         <table className={styles.tokenTable}>
           <tbody>
             {groupTokens(sentence.tokens).map((group) => (
@@ -80,7 +94,7 @@ export function SentenceCard({ title, sentence, speechLang }: SentenceCardProps)
                 </td>
                 <td className={styles.muted}>{group.surfaces.join(", ")}</td>
                 <td>{group.meaning}</td>
-                <td className={group.judgement === "outside" ? styles.outsideLabel : styles.muted}>
+                <td className={`${styles.judgement} ${group.judgement === "outside" ? styles.judgementOutside : styles.muted}`}>
                   {judgementLabels[group.judgement]}
                 </td>
               </tr>

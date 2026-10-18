@@ -1,25 +1,30 @@
 :root {
-  --color-background: #f7f7f5;
-  --color-surface: #ffffff;
-  --color-text: #1f2328;
-  --color-text-muted: #656d76;
-  --color-border: #e4e4e0;
-  --color-accent: #2f6f5e;
-  --color-accent-soft: #e3efea;
-  --radius: 8px;
-  --font-sans: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
-}
+  --color-background: #0a0818;
+  --color-panel: rgb(26 20 58 / 0.62);
+  --color-panel-solid: #191339;
+  --color-input: rgb(10 8 24 / 0.55);
+  --color-border: rgb(167 139 250 / 0.18);
+  --color-border-strong: rgb(167 139 250 / 0.36);
+  --color-text: #eeeaff;
+  --color-text-muted: #a69fd0;
+  --color-text-faint: #6c6597;
+  --color-hover: rgb(167 139 250 / 0.08);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #161817;
-    --color-surface: #1f2221;
-    --color-text: #e6e8e7;
-    --color-text-muted: #9aa3a0;
-    --color-border: #313634;
-    --color-accent: #7cc4ad;
-    --color-accent-soft: #24332e;
-  }
+  --color-mint: #8fd9c8;
+  --color-pink: #f29bd8;
+  --color-lavender: #b3a3f0;
+  --color-sky: #93c9e6;
+  --color-lemon: #e8d48a;
+  --color-peach: #eab18f;
+  --color-outside: #ff6b6b;
+
+  --radius: 18px;
+  --radius-small: 12px;
+  --shadow-panel: 0 10px 40px rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.04);
+
+  --font-ui: var(--font-latin), var(--font-rounded), "Hiragino Maru Gothic ProN", sans-serif;
+
+  color-scheme: dark;
 }
 
 * {
@@ -28,12 +33,137 @@
 
 body {
   margin: 0;
-  background: var(--color-background);
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgb(143 217 200 / 0.08), transparent 60%),
+    radial-gradient(1000px 600px at 110% 0%, rgb(242 155 216 / 0.08), transparent 60%),
+    var(--color-background);
   color: var(--color-text);
-  font-family: var(--font-sans);
+  font-family: var(--font-ui);
+  font-size: 15px;
   line-height: 1.6;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: rgb(255 122 217 / 0.35);
+}
+
 a {
-  color: var(--color-accent);
+  color: var(--color-sky);
+}
+
+h1 {
+  margin: 0 0 20px;
+  font-size: 24px;
+  letter-spacing: 0.02em;
+}
+
+/* すりガラスのパネル */
+.panel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-panel);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-panel);
+}
+
+/* 丸い切り替えボタンの並び（言語、話し手など） */
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: rgb(10 8 24 / 0.6);
+}
+
+.segmented > a,
+.segmented > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.segmented > a:hover,
+.segmented > button:hover {
+  color: var(--color-text);
+}
+
+.segmented > [aria-current="page"],
+.segmented > [aria-pressed="true"] {
+  background: rgb(179 163 240 / 0.2);
+  box-shadow: inset 0 0 0 1px rgb(179 163 240 / 0.45);
+  color: var(--color-text);
+}
+
+/* グラデーションの主ボタン */
+.primary-button {
+  height: 38px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender));
+  box-shadow: 0 0 10px rgb(242 155 216 / 0.3);
+  color: #1a0f2e;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.primary-button:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.primary-button:disabled {
+  box-shadow: none;
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* 入力欄 */
+.text-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  outline: none;
+  background: var(--color-input);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.text-input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.text-input:focus {
+  border-color: var(--color-sky);
+  box-shadow: 0 0 0 3px rgb(147 201 230 / 0.15);
+}
+
+/* 小さい見出し（Translation など） */
+.label {
+  color: var(--color-text-faint);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }

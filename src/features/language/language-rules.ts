@@ -3,6 +3,9 @@ export type LanguageRules = {
   englishName: string;
   // 読み上げに使う言語と地域（ブラウザの音声合成に渡す）
   speechLang: string;
+  // 話し手の性別で、自分について言うときの語形が変わる言語か（je suis fatiguée など）。
+  // 変わらない言語では、画面で女性形・男性形を選ばせず、プロンプトにも書かない
+  hasSpeakerGender: boolean;
   // プロンプトに差し込む、文法で特に確かめてほしいこと
   grammarChecks: string;
   // プロンプトに差し込む、単語の書き出しの特別ルール
@@ -22,6 +25,7 @@ export type LanguageRules = {
 const defaultRules: LanguageRules = {
   englishName: "",
   speechLang: "",
+  hasSpeakerGender: true,
   grammarChecks: "auxiliaries, agreement, prepositions, word order.",
   tokenRules: [],
   keepsApostropheInsideWords: false,
@@ -35,6 +39,7 @@ const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
   en: {
     englishName: "English",
     speechLang: "en-GB",
+    hasSpeakerGender: false,
     grammarChecks:
       "Tense consistency (past simple vs present perfect). Third person -s. Articles (a / an / the). Prepositions of time and place (in / on / at). Question word order with do / does / did.",
     tokenRules: [
@@ -117,6 +122,7 @@ const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
   sv: {
     englishName: "Swedish",
     speechLang: "sv-SE",
+    hasSpeakerGender: false,
     grammarChecks:
       "Verb-second word order in main clauses. Definite forms (suffixed articles: huset, bilen). en/ett gender agreement. Adjective agreement (stor / stort / stora).",
   },

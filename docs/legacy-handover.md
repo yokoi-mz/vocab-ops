@@ -450,6 +450,8 @@ Still prefer versatile, high-frequency new lemmas. This is NOT unrestricted tran
 
 決まった論点：
 - 取り違え検出（チェック C）→ 全言語で、旧版と同じく不合格にして作り直させる。誤判定は、言語ごとの例外一覧（`src/features/language/language-rules.ts`）で防ぐ。旧版で誤判定した5件と、英語の不規則な形（went→go、were→be、better・best→good、worse・worst→bad）を最初から入れる。新しい誤判定が見つかったら、例外一覧とテストに足す
+- 履歴の見せ方 → 別の画面は作らず、文生成の画面の下に、選んでいる言語の履歴を新しい順に並べる（20件ずつ）。行を押すと、その場で手札語彙文・拡張語彙文のカードを開く。作り終わった文は、そのまま履歴の一番上に加わる
+- 話し手の性別（女性形・男性形）→ 自分について言うときに語形が変わる言語（フランス語・イタリア語・スペイン語・ドイツ語）だけで選ばせる。英語とスウェーデン語では、画面に出さず、プロンプトにも書かない（言語ごとの規則 `hasSpeakerGender`）。DB の `generations.speaker` には、その場合も値（初期値の female）が入るが、意味は持たない
 - 英語の短縮形 → 単語に分けるとき、英語だけは単語の中のアポストロフィで切らない（`don't` は1語）。AI が `do` と `n't` に分けて書き出した場合も、つなげた形で一致とみなす
 - 新版での判定ラベルの名前 → 手札語彙（`activeVocab`）・ノーカン語彙（`uncountedVocab`）・手札外語彙（`outsideVocab`）・固有名詞・数字（`properOrNumber`）（`00-overview.md` の用語集）
 - 調整UI のコードでの名前 → `vocabAdminSetup`（`00-overview.md` の用語集）

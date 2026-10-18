@@ -20,9 +20,9 @@ export function getGenerationDetail(id: number): GenerationDetail | undefined {
   return { ...generation, sentences: listSentences(db, id) };
 }
 
-export function listRecentGenerations(language: string, limit: number): GenerationDetail[] {
+export function listRecentGenerations(language: string, limit: number, beforeSeq: number | null): GenerationDetail[] {
   const db = getDatabase();
-  return listGenerations(db, language, limit).map((generation) => ({
+  return listGenerations(db, language, limit, beforeSeq).map((generation) => ({
     ...generation,
     sentences: listSentences(db, generation.id),
   }));

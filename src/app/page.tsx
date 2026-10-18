@@ -2,6 +2,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { getLanguageName } from "@/features/language";
 import { getVocabulary, listImportedLanguages } from "@/features/vocabulary";
+import { Flag } from "@/shared/ui/flag";
 import styles from "./page.module.css";
 
 export default async function HomePage() {
@@ -10,7 +11,7 @@ export default async function HomePage() {
 
   return (
     <main>
-      <h1>語彙一覧</h1>
+      <h1>語彙</h1>
       {languages.length === 0 ? (
         <p>
           まだ言語がありません。<code>npm run import-baseline -- en</code> のように、ベースラインを取り込んでください。
@@ -21,10 +22,15 @@ export default async function HomePage() {
             const { activeVocab, uncountedVocab } = getVocabulary(language);
             return (
               <li key={language}>
-                <Link href={`/vocabulary/${language}`} className={styles.languageCard}>
-                  <span className={styles.languageName}>{getLanguageName(language)}</span>
+                <Link href={`/vocabulary/${language}`} className={`panel ${styles.languageCard}`}>
+                  <span className={styles.languageName}>
+                    <Flag language={language} />
+                    {getLanguageName(language)}
+                  </span>
                   <span className={styles.counts}>
-                    手札語彙 {activeVocab.length} 語・ノーカン語彙 {uncountedVocab.length} 語
+                    <strong>{activeVocab.length}</strong> 手札語彙
+                    <span className={styles.separator}>・</span>
+                    {uncountedVocab.length} ノーカン語彙
                   </span>
                 </Link>
               </li>

@@ -138,6 +138,7 @@ const generationRowSchema = z.object({
   speaker: z.enum(["female", "male"]),
   active_vocab_version: z.number().nullable(),
   model: z.string().nullable(),
+  expanded_outside_word_limit: z.number().nullable(),
   cost_usd: z.number().nullable(),
   error: z.string().nullable(),
   created_at: z.string(),
@@ -153,6 +154,7 @@ export type Generation = {
   speaker: Speaker;
   activeVocabVersion: number | null;
   model: string | null;
+  expandedOutsideWordLimit: number | null;
   costUsd: number | null;
   error: string | null;
   createdAt: string;
@@ -170,6 +172,7 @@ function toGeneration(row: unknown): Generation {
     speaker: generation.speaker,
     activeVocabVersion: generation.active_vocab_version,
     model: generation.model,
+    expandedOutsideWordLimit: generation.expanded_outside_word_limit,
     costUsd: generation.cost_usd,
     error: generation.error,
     createdAt: generation.created_at,
@@ -177,17 +180,22 @@ function toGeneration(row: unknown): Generation {
 }
 
 const generationColumns =
-  "id, language, seq, status, message, situation, speaker, active_vocab_version, model, cost_usd, error, created_at";
+  "id, language, seq, status, message, situation, speaker, active_vocab_version, model, expanded_outside_word_limit, cost_usd, error, created_at";
 
 export function findGeneration(db: DatabaseSync, id: number): Generation | undefined {
   const row = db.prepare(`SELECT ${generationColumns} FROM generations WHERE id = ?`).get(id);
   return row === undefined ? undefined : toGeneration(row);
 }
 
-export function listGenerations(db: DatabaseSync, language: string, limit: number): Generation[] {
+// その言語の文生成を、新しい順に読む。beforeSeq を渡すと、その通し番号より古いものだけを読む。
+export function listGenerations(db: DatabaseSync, language: string, limit: number, beforeSeq: number | null): Generation[] {
   return db
-    .prepare(`SELECT ${generationColumns} FROM generations WHERE language = ? ORDER BY seq DESC LIMIT ?`)
-    .all(language, limit)
+    .prepare(`
+      SELECT ${generationColumns} FROM generations
+      WHERE language = ? AND seq < ?
+      ORDER BY seq DESC LIMIT ?
+    `)
+    .all(language, beforeSeq ?? Number.MAX_SAFE_INTEGER, limit)
     .map(toGeneration);
 }
 

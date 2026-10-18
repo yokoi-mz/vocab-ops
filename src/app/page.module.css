@@ -1,7 +1,7 @@
 .languageList {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
-  gap: 12px;
+  gap: 14px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -10,25 +10,37 @@
 .languageCard {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 16px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
+  gap: 10px;
+  padding: 18px 20px;
   color: var(--color-text);
   text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
 }
 
 .languageCard:hover {
-  border-color: var(--color-accent);
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
 }
 
 .languageName {
-  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
   font-weight: 700;
 }
 
 .counts {
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: 14px;
+}
+
+.counts strong {
+  color: var(--color-mint);
+  font-size: 20px;
+}
+
+.separator {
+  margin: 0 6px;
+  color: var(--color-text-faint);
 }
