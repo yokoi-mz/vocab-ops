@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { selectableVocabSizeModes } from "@/features/vocab-ops";
+import { listSelectableVocabSizeModes } from "@/features/vocab-ops";
 import { changeLanguageSettings, listImportedLanguages } from "@/features/vocabulary";
 
 const requestBodySchema = z
@@ -21,7 +21,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ co
     return Response.json({ error: "入力の形が正しくありません。" }, { status: 400 });
   }
   const { vocabSizeMode } = parsed.data;
-  if (vocabSizeMode !== undefined && !selectableVocabSizeModes.includes(vocabSizeMode)) {
+  if (vocabSizeMode !== undefined && !listSelectableVocabSizeModes(code).includes(vocabSizeMode)) {
     return Response.json({ error: "その増減モードは、まだ選べません。" }, { status: 400 });
   }
   changeLanguageSettings(code, parsed.data);

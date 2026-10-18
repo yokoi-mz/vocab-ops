@@ -3,7 +3,9 @@ import {
   canReuseCurrentSetSentence,
   generateCurrentSetSentence,
   getDoneGenerationDetails,
+  listActiveWordUsages,
   listDoneGenerations,
+  listOutsideWordAppearances,
   type GenerationDetail,
 } from "@/features/generation";
 import type { VocabSizeMode, VocabSnapshot } from "@/features/vocabulary";
@@ -42,18 +44,35 @@ export class CostLimitError extends Error {
   }
 }
 
-// 検証に使う履歴を選ぶ。直近の recentWindow 件から recentCount 件、それより前から olderCount 件を、無作為に選ぶ。
+// 検証に使う履歴を選ぶ（合わせて validationRecentCount ＋ validationOlderCount 件まで）。
+// まず、入れ替える語が関係する履歴（relevantIds）から選ぶ。外す語が使われた文生成や、足す語が拡張語彙文に出た文生成では、
+// 語を入れ替えた影響が文に出やすいため。足りない分は、直近の recentWindow 件とそれより前から、件数の割合を保って無作為に選ぶ。
 export function selectValidationSources(
   generations: { id: number; seq: number }[],
+  relevantIds: Set<number>,
   random: () => number = Math.random,
 ): number[] {
-  const sorted = [...generations].sort((a, b) => b.seq - a.seq);
-  const recent = sorted.slice(0, vocabOpsSettings.validationRecentWindow);
-  const older = sorted.slice(vocabOpsSettings.validationRecentWindow);
-  return [
-    ...pickRandom(recent, vocabOpsSettings.validationRecentCount, random),
-    ...pickRandom(older, vocabOpsSettings.validationOlderCount, random),
-  ].map((generation) => generation.id);
+  const { validationRecentWindow, validationRecentCount, validationOlderCount } = vocabOpsSettings;
+  const total = validationRecentCount + validationOlderCount;
+  const relevant = pickRandom(
+    generations.filter((generation) => relevantIds.has(generation.id)),
+    total,
+    random,
+  );
+
+  const need = total - relevant.length;
+  const rest = [...generations].filter((generation) => !relevantIds.has(generation.id)).sort((a, b) => b.seq - a.seq);
+  const recentIds = new Set([...generations].sort((a, b) => b.seq - a.seq).slice(0, validationRecentWindow).map((generation) => generation.id));
+  const recent = rest.filter((generation) => recentIds.has(generation.id));
+  const older = rest.filter((generation) => !recentIds.has(generation.id));
+  const olderPicked = pickRandom(older, Math.min(older.length, Math.round((need * validationOlderCount) / total)), random);
+  const recentPicked = pickRandom(recent, need - olderPicked.length, random);
+  const olderExtra = pickRandom(
+    older.filter((generation) => !olderPicked.includes(generation)),
+    need - olderPicked.length - recentPicked.length,
+    random,
+  );
+  return [...relevant, ...recentPicked, ...olderPicked, ...olderExtra].map((generation) => generation.id);
 }
 
 function pickRandom<T>(items: T[], count: number, random: () => number): T[] {
@@ -87,6 +106,8 @@ export async function runValidation(input: {
   mode: VocabSizeMode;
   currentSnapshot: VocabSnapshot;
   proposedSnapshot: VocabSnapshot;
+  // 更新案で入れ替える語（足す語と外す語）の番号
+  changedWordIds: number[];
   // ここまでに使った費用と、使ってよい上限（ドル）
   spentUsd: number;
   limitUsd: number;
@@ -95,8 +116,17 @@ export async function runValidation(input: {
 }): Promise<ValidationOutcome> {
   let costUsd = 0;
   const overLimit = () => input.spentUsd + costUsd > input.limitUsd;
-  const sources = getDoneGenerationDetails(selectValidationSources(listDoneGenerations(input.language)));
-  input.onProgress(`語彙更新検証を開始：履歴 ${sources.length} 件で、今の手札語彙文と提案語彙文を用意する`);
+  const changed = new Set(input.changedWordIds);
+  const relevantIds = new Set(
+    [...listActiveWordUsages(input.language), ...listOutsideWordAppearances(input.language)]
+      .filter((occurrence) => changed.has(occurrence.wordId))
+      .map((occurrence) => occurrence.generationId),
+  );
+  const sourceIds = selectValidationSources(listDoneGenerations(input.language), relevantIds);
+  const sources = getDoneGenerationDetails(sourceIds);
+  input.onProgress(
+    `語彙更新検証を開始：履歴 ${sources.length} 件（うち入れ替える語が関係する履歴 ${sourceIds.filter((id) => relevantIds.has(id)).length} 件）で、今の手札語彙文と提案語彙文を用意する`,
+  );
 
   const prepared = await mapWithConcurrency(sources, concurrency, async (source, index): Promise<ValidationPair | undefined> => {
     if (overLimit()) {
@@ -169,28 +199,31 @@ const answersSchema = z.object({
 
 // 複数の組をまとめて LLM に渡し、どちらの文が原文の意味をより忠実に表しているかを判定させる。
 async function judgeBatch(pairs: ValidationPair[]): Promise<{ judgements: (ValidationJudgement | null)[]; costUsd: number }> {
+  const currentFirst = (pair: ValidationPair) => pair.presentedFirst === "current_set";
   const problems = pairs.map((pair, index) => {
-    const [first, second] =
-      pair.presentedFirst === "current_set"
-        ? [pair.currentSetSentence, pair.proposedSetSentence]
-        : [pair.proposedSetSentence, pair.currentSetSentence];
+    const [first, second] = currentFirst(pair)
+      ? [pair.currentSetSentence, pair.proposedSetSentence]
+      : [pair.proposedSetSentence, pair.currentSetSentence];
     return `Problem ${index + 1}\nOriginal: ${pair.message}\nSentence 1: ${first}\nSentence 2: ${second}`;
   });
-  const prompt = `A language learner wanted to say the ORIGINAL (Japanese). Two sentences try to express it in a foreign language.
-For each problem, decide which sentence lets a listener understand the ORIGINAL more accurately and completely.
+  // 2026-10-19 の実験で決めたプロンプト（docs/vocab-ops/experiments/2026-10-19-judge-prompt.md）
+  const prompt = `A language learner wanted to say the ORIGINAL (Japanese). Two sentences try to say it in a foreign language
+with a limited vocabulary, so both may use roundabout descriptions.
+For each problem, decide whether one sentence conveys the ORIGINAL clearly better than the other.
 
-How to judge:
-- Specific information matters most: places, things, people, times, actions, amounts.
-  A sentence that names them (e.g. "station", "train", "meeting", "wait") is MORE faithful than one that replaces them
-  with a vague paraphrase (e.g. "the place where we get on and get down", "the thing we take", "a place where we speak together").
-- Information that is missing or changed makes a sentence LESS faithful (e.g. "airport" became "station", "coffee" became "this").
-- Information that is not in the original, added to the sentence, makes it LESS faithful.
-- Do NOT judge grammar, naturalness, style or length, except when they make the meaning unclear.
-- Answer "same" only when a listener would understand essentially the same thing from both sentences.
+Steps for each problem:
+1. key_info: list the 2-4 most important pieces of information in the ORIGINAL (who, what action, what thing, where, when).
+2. For each sentence, mark each piece: "ok" (named, or described so that a listener can tell what it is),
+   "vague" (only a general word such as "thing" or "place"), "missing", or "wrong" (changed into something else).
+   Also note information the sentence ADDS that is not in the ORIGINAL. Added information counts as "wrong".
+3. answer:
+   - "1" or "2": only if that sentence conveys at least one key piece clearly better than the other
+     (for example "ok" against "vague", "missing" or "wrong"), and is not worse on any other key piece.
+   - "same": if the marks are equal, if both are equally vague, if each sentence is better on a different piece,
+     or if the sentences differ only in wording, style, length or grammar.
 
-For each problem, first write a short reason in English, then the answer: "1" (sentence 1 is more faithful), "2" (sentence 2 is more faithful) or "same".
 Output ONLY one JSON object, no prose:
-{"answers": [{"problem": 1, "reason": "...", "answer": "1"}, {"problem": 2, "reason": "...", "answer": "same"}]}
+{"answers": [{"problem": 1, "key_info": ["..."], "sentence_1": "...", "sentence_2": "...", "answer": "1"}]}
 
 ${problems.join("\n\n")}`;
 
@@ -212,7 +245,7 @@ ${problems.join("\n\n")}`;
       return null;
     }
     const firstWins = answer === "1";
-    const proposedWins = pair.presentedFirst === "proposed_set" ? firstWins : !firstWins;
+    const proposedWins = currentFirst(pair) ? !firstWins : firstWins;
     return proposedWins ? "improved" : "worsened";
   });
   return { judgements, costUsd: result.costUsd };

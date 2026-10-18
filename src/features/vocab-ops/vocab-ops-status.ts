@@ -1,5 +1,5 @@
 import { countDoneGenerationsSince, listActiveWordUsages, listDoneSeqs } from "@/features/generation";
-import { getLanguageStatus, getVocabSnapshot } from "@/features/vocabulary";
+import { getLanguageStatus, getVocabSnapshot, type VocabSizeMode } from "@/features/vocabulary";
 import { getDatabase } from "@/shared/db";
 import { listOpsEvents } from "@/shared/ops-log";
 import { countAdditionCandidates, type AdditionCandidate } from "./addition-candidates";
@@ -98,4 +98,11 @@ export function getVocabUpdateRun(id: number): VocabUpdateRun | undefined {
     candidates: listCandidates(db, [id]),
     validations: listValidations(db, [id]),
   };
+}
+
+// 画面で選べる増減モード（04-vocab-size-mode.md）。
+// 「増やす」「変えない」はいつでも選べる。「減らす」は、その言語に削除候補が出てきてから選べる
+export function listSelectableVocabSizeModes(language: string): VocabSizeMode[] {
+  const hasRemovalCandidate = listRemovalWatch(language, Number.MAX_SAFE_INTEGER).some((item) => item.isCandidate);
+  return hasRemovalCandidate ? ["increase", "keep", "decrease"] : ["increase", "keep"];
 }

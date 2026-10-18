@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getLanguageName, getLanguageRules } from "@/features/language";
-import { selectableVocabSizeModes } from "@/features/vocab-ops";
+import { listSelectableVocabSizeModes } from "@/features/vocab-ops";
 import { getLanguageStatus, listImportedLanguages } from "@/features/vocabulary";
 import { LanguageSettingsPanel } from "./language-settings-panel";
 import styles from "./page.module.css";
@@ -34,7 +34,7 @@ export default async function SettingsPage() {
                 expandedOutsideWordLimit: status.expandedOutsideWordLimit,
                 vocabSizeMode: status.vocabSizeMode,
               }}
-              selectableModes={selectableVocabSizeModes}
+              selectableModes={listSelectableVocabSizeModes(language)}
             />
           );
         })}

@@ -43,7 +43,7 @@ export function VocabSizeModeSwitch({ language, current, selectable }: VocabSize
             type="button"
             aria-pressed={mode === current}
             disabled={!enabled}
-            title={enabled ? undefined : "削除候補が出るほど履歴がたまってから、選べるようにします"}
+            title={enabled ? undefined : "削除候補が出てきたら、選べるようになります"}
             onClick={() => void change(mode)}
           >
             {label}

@@ -2,28 +2,38 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { buildProposal } from "./proposal";
 
-const additions = [11, 12, 13, 14, 15, 16, 17];
-const removals = [21, 22, 23];
+const additions = [11, 12, 13, 14, 15, 16, 17, 18];
+const removals = [21, 22, 23, 24, 25, 26, 27, 28];
+const count = (proposal: { additions: number[]; removals: number[] }) => [proposal.additions.length, proposal.removals.length];
 
-test("増やす：足すのは上限まで、外すのは足す数を超えない", () => {
-  assert.deepEqual(buildProposal("increase", additions, removals, 5, 5), { additions: [11, 12, 13, 14, 15], removals: [21, 22, 23] });
-  assert.deepEqual(buildProposal("increase", [11, 12], removals, 5, 5), { additions: [11, 12], removals: [21, 22] });
+test("増やす：削除候補がなければ、＋3", () => {
+  assert.deepEqual(count(buildProposal("increase", additions, [], 3, 3)), [3, 0]);
 });
 
-test("増やす：追加候補がなければ、何も外さない", () => {
-  assert.deepEqual(buildProposal("increase", [], removals, 5, 5), { additions: [], removals: [] });
+test("増やす：削除候補があれば、−3 ＋6（差し引き ＋3）", () => {
+  assert.deepEqual(buildProposal("increase", additions, removals, 3, 3), { additions: [11, 12, 13, 14, 15, 16], removals: [21, 22, 23] });
 });
 
-test("変えない：足す数と外す数を同じにする", () => {
-  assert.deepEqual(buildProposal("keep", additions, removals, 5, 5), { additions: [11, 12, 13], removals: [21, 22, 23] });
-  assert.deepEqual(buildProposal("keep", additions, [], 5, 5), { additions: [], removals: [] });
+test("増やす：削除候補が1語なら、−1 ＋4（差し引き ＋3）", () => {
+  assert.deepEqual(count(buildProposal("increase", additions, [21], 3, 3)), [4, 1]);
 });
 
-test("減らす：外す数より少なく足し、必ず純減にする", () => {
-  assert.deepEqual(buildProposal("decrease", additions, removals, 5, 5), { additions: [11, 12], removals: [21, 22, 23] });
-  assert.deepEqual(buildProposal("decrease", additions, [21], 5, 5), { additions: [], removals: [21] });
+test("増やす：追加候補が足りなければ、差し引きがプラスのままになるように外す数を減らす", () => {
+  assert.deepEqual(count(buildProposal("increase", [11, 12, 13, 14], removals, 3, 3)), [4, 1]);
+  assert.deepEqual(count(buildProposal("increase", [11, 12], removals, 3, 3)), [2, 0]);
 });
 
-test("減らす：削除候補がなければ、何もしない", () => {
-  assert.deepEqual(buildProposal("decrease", additions, [], 5, 5), { additions: [], removals: [] });
+test("変えない：−3 ＋3。どちらかがなければ何もしない", () => {
+  assert.deepEqual(count(buildProposal("keep", additions, removals, 3, 3)), [3, 3]);
+  assert.deepEqual(count(buildProposal("keep", additions, [], 3, 3)), [0, 0]);
+  assert.deepEqual(count(buildProposal("keep", [11], removals, 3, 3)), [1, 1]);
+});
+
+test("減らす：外すだけで −3。足さない", () => {
+  assert.deepEqual(buildProposal("decrease", additions, removals, 3, 3), { additions: [], removals: [21, 22, 23] });
+});
+
+test("減らす：削除候補が3語より少なければ、あるだけ外す。なければ何もしない", () => {
+  assert.deepEqual(count(buildProposal("decrease", additions, [21, 22], 3, 3)), [0, 2]);
+  assert.deepEqual(count(buildProposal("decrease", additions, [], 3, 3)), [0, 0]);
 });

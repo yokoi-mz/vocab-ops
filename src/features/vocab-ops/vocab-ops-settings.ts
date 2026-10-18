@@ -1,4 +1,3 @@
-import type { VocabSizeMode } from "@/features/vocabulary";
 import type { ProviderRouting } from "@/shared/openrouter";
 
 // 語彙更新の数値。docs/vocab-ops/parameters.md と同じ値にする。
@@ -15,9 +14,10 @@ export const vocabOpsSettings = {
   removalRecentWindow: 60,
   // 削除判定の使用回数のしきい値（直近の集計期間で、この回数以下なら削除候補）
   removalMaxRecentUses: 0,
-  // 1回の語彙更新で足す語数・外す語数の上限
-  maxAdditions: 5,
-  maxRemovals: 5,
+  // 1回の語彙更新で増やす・減らす語数（増やす：＋3、減らす：−3）
+  sizeStep: 3,
+  // 1回の語彙更新で入れ替える語数の上限（増やす：−3 ＋6、変えない：−3 ＋3 まで。減らすは入れ替えない）
+  swapLimit: 3,
   // 語彙更新検証に使う履歴：直近の何件から何件、それより前から何件
   validationRecentWindow: 30,
   validationRecentCount: 20,
@@ -34,13 +34,10 @@ export const vocabOpsSettings = {
 
 export type VocabOpsSettings = typeof vocabOpsSettings;
 
-// 画面で選べる増減モード（04-vocab-size-mode.md）。
-// 「減らす」は、削除候補が出るほど履歴がたまったら足す。
-export const selectableVocabSizeModes: VocabSizeMode[] = ["increase", "keep"];
 
 // 語彙更新で使う AI のモデル（追加候補の順位付け、語彙更新検証の比較判定）と、それを動かす会社（文生成と同じ）
 export const vocabOpsModel = "deepseek/deepseek-v4.1-flash";
 export const vocabOpsProvider: ProviderRouting = { only: ["deepinfra"], quantizations: ["fp8"], allowFallbacks: false };
 
 // 語彙更新のプロンプトを変えたら、この版を進める
-export const vocabOpsPromptVersion = "2026-10-18.2";
+export const vocabOpsPromptVersion = "2026-10-19.1";

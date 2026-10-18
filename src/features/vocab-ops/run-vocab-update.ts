@@ -139,18 +139,7 @@ async function runVocabUpdate(update: ClaimedVocabUpdate, addCost: (costUsd: num
     `直近 ${settings.additionWindow} 件の拡張語彙文から、追加候補を ${additionCandidates.length} 語数えた` +
       (additionCandidates.length > 0 ? `（${additionCandidates.slice(0, 8).map((candidate) => `${candidate.lemma} ${candidate.occurrences}回`).join("、")}${additionCandidates.length > 8 ? "…" : ""}）` : ""),
   );
-  const ranking = await rankAdditionCandidates(update.language, additionCandidates, snapshot.activeWords);
-  addCost(ranking.costUsd);
-  if (additionCandidates.length === 0) {
-    log("ranking", "追加候補がないので、LLM の順位付けは飛ばした");
-  } else {
-    const lemmaOf = (wordId: number) => additionCandidates.find((candidate) => candidate.wordId === wordId)?.lemma ?? String(wordId);
-    log(
-      "ranking",
-      `LLM が追加候補に順位を付けた：${ranking.ranked.map((item, index) => `${index + 1}. ${lemmaOf(item.wordId)}`).join("、") || "（足す価値がある語なし）"}` +
-        `（順位に入らなかった語 ${additionCandidates.length - ranking.ranked.length}）`,
-    );
-  }
+  // 削除候補は LLM を使わずに出せるので、先に出しておく（「変えない」「減らす」で削除候補がなければ、LLM の順位付けを飛ばすため）
   const removalCandidates = findRemovalCandidates({
     activeWords: snapshot.activeWords,
     doneSeqs: listDoneSeqs(update.language),
@@ -159,6 +148,30 @@ async function runVocabUpdate(update: ClaimedVocabUpdate, addCost: (costUsd: num
     recentWindow: settings.removalRecentWindow,
     maxRecentUses: settings.removalMaxRecentUses,
   });
+  // 足す語を選ぶのは「増やす」と、削除候補がある「変えない」だけ。それ以外では、費用のかかる順位付けはしない
+  const rankingNeeded =
+    additionCandidates.length > 0 && (vocabSizeMode === "increase" || (vocabSizeMode === "keep" && removalCandidates.length > 0));
+  const ranking = rankingNeeded
+    ? await rankAdditionCandidates(update.language, additionCandidates, snapshot.activeWords)
+    : { ranked: [], costUsd: 0 };
+  addCost(ranking.costUsd);
+  if (additionCandidates.length === 0) {
+    log("ranking", "追加候補がないので、LLM の順位付けは飛ばした");
+  } else if (!rankingNeeded) {
+    log(
+      "ranking",
+      vocabSizeMode === "decrease"
+        ? "「減らす」モードでは語を足さないので、LLM の順位付けは飛ばした"
+        : "削除候補がなく、「変えない」モードでは語を足せないので、LLM の順位付けは飛ばした",
+    );
+  } else {
+    const lemmaOf = (wordId: number) => additionCandidates.find((candidate) => candidate.wordId === wordId)?.lemma ?? String(wordId);
+    log(
+      "ranking",
+      `LLM が追加候補に順位を付けた：${ranking.ranked.map((item, index) => `${index + 1}. ${lemmaOf(item.wordId)}`).join("、") || "（足す価値がある語なし）"}` +
+        `（順位に入らなかった語 ${additionCandidates.length - ranking.ranked.length}）`,
+    );
+  }
 
   log(
     "removals",
@@ -171,8 +184,8 @@ async function runVocabUpdate(update: ClaimedVocabUpdate, addCost: (costUsd: num
     vocabSizeMode,
     ranking.ranked.map((item) => item.wordId),
     removalCandidates.map((candidate) => candidate.wordId),
-    settings.maxAdditions,
-    settings.maxRemovals,
+    settings.sizeStep,
+    settings.swapLimit,
   );
 
   // 候補と更新案を記録する（反映するかどうかにかかわらず）
@@ -256,6 +269,7 @@ async function runVocabUpdate(update: ClaimedVocabUpdate, addCost: (costUsd: num
       language: update.language,
       mode: vocabSizeMode,
       currentSnapshot: snapshot,
+      changedWordIds: [...proposal.additions, ...proposal.removals],
       proposedSnapshot: createVocabSnapshot(
         update.language,
         snapshot.version,

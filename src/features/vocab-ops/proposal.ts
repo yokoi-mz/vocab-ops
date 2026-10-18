@@ -6,24 +6,28 @@ export type Proposal = {
 };
 
 // 増減モードに合わせて、追加候補と削除候補（どちらも順位の高い順の語の番号）から、更新案を作る（04-vocab-size-mode.md）。
-//   増やす：足すのは上限まで。外すのは、足す数を超えない範囲（数を減らさない）
-//   変えない：足す数と外す数を同じにする
-//   減らす：外すのは上限まで。足すのは、外す数より少ない範囲（必ず純減にする）
+//   sizeStep：1回の語彙更新で増やす・減らす語数（例：3）
+//   swapLimit：1回の語彙更新で入れ替える語数の上限（例：3）
+//
+//   増やす：削除候補がなければ ＋sizeStep。あれば −swapLimit ＋(sizeStep＋swapLimit) まで。差し引きは必ずプラス
+//   変えない：−swapLimit ＋swapLimit まで。差し引きは 0
+//   減らす：−sizeStep まで。外すだけで、足さない（入れ替えはしないので、語彙更新検証も動かない）
 export function buildProposal(
   mode: VocabSizeMode,
   additionCandidates: number[],
   removalCandidates: number[],
-  maxAdditions: number,
-  maxRemovals: number,
+  sizeStep: number,
+  swapLimit: number,
 ): Proposal {
   if (mode === "increase") {
-    const additions = additionCandidates.slice(0, maxAdditions);
-    return { additions, removals: removalCandidates.slice(0, Math.min(maxRemovals, additions.length)) };
+    const additionCount = Math.min(additionCandidates.length, sizeStep + Math.min(swapLimit, removalCandidates.length));
+    // 追加候補が足りないときも、差し引きがプラスのままになるように、外す数を減らす
+    const removalCount = Math.min(swapLimit, removalCandidates.length, Math.max(0, additionCount - sizeStep));
+    return { additions: additionCandidates.slice(0, additionCount), removals: removalCandidates.slice(0, removalCount) };
   }
   if (mode === "keep") {
-    const count = Math.min(additionCandidates.length, removalCandidates.length, maxAdditions, maxRemovals);
+    const count = Math.min(swapLimit, additionCandidates.length, removalCandidates.length);
     return { additions: additionCandidates.slice(0, count), removals: removalCandidates.slice(0, count) };
   }
-  const removals = removalCandidates.slice(0, maxRemovals);
-  return { additions: additionCandidates.slice(0, Math.min(maxAdditions, Math.max(removals.length - 1, 0))), removals };
+  return { additions: [], removals: removalCandidates.slice(0, sizeStep) };
 }
