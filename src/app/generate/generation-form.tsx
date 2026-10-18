@@ -102,6 +102,8 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
       return;
     }
     setShownIds((ids) => ({ ...ids, [language]: body.id }));
+    // 送った言いたいことは、上の結果に出るので、入力欄は空にする（状況は続けて使うことが多いので残す）
+    setMessage("");
   }
 
   function submitWithShortcut(event: KeyboardEvent) {

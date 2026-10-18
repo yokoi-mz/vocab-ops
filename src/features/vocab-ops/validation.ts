@@ -90,10 +90,13 @@ export async function runValidation(input: {
   // ここまでに使った費用と、使ってよい上限（ドル）
   spentUsd: number;
   limitUsd: number;
+  // 途中経過を知らせる（Ops の画面の記録に使う）
+  onProgress: (message: string) => void;
 }): Promise<ValidationOutcome> {
   let costUsd = 0;
   const overLimit = () => input.spentUsd + costUsd > input.limitUsd;
   const sources = getDoneGenerationDetails(selectValidationSources(listDoneGenerations(input.language)));
+  input.onProgress(`語彙更新検証を開始：履歴 ${sources.length} 件で、今の手札語彙文と提案語彙文を用意する`);
 
   const prepared = await mapWithConcurrency(sources, concurrency, async (source, index): Promise<ValidationPair | undefined> => {
     if (overLimit()) {
@@ -123,6 +126,9 @@ export async function runValidation(input: {
   }
 
   const pairs = prepared.filter((pair) => pair !== undefined);
+  input.onProgress(
+    `比べる文を ${pairs.length} 組用意した（手札語彙文の使い回し ${pairs.filter((pair) => pair.currentSetReused).length} 組・作れなかった履歴 ${sources.length - pairs.length} 件）`,
+  );
   for (let start = 0; start < pairs.length; start += judgeBatchSize) {
     const batch = pairs.slice(start, start + judgeBatchSize);
     const result = await judgeBatch(batch);
@@ -130,6 +136,11 @@ export async function runValidation(input: {
     batch.forEach((pair, index) => {
       pair.judgement = result.judgements[index];
     });
+    const judged = pairs.slice(0, start + batch.length);
+    const count = (judgement: ValidationJudgement) => judged.filter((pair) => pair.judgement === judgement).length;
+    input.onProgress(
+      `比較判定 ${judged.length} / ${pairs.length} 組：改善 ${count("improved")}・悪化 ${count("worsened")}・同等 ${count("same")}`,
+    );
   }
 
   const counts: ValidationCounts = {

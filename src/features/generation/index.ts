@@ -2,6 +2,7 @@ export { canReuseCurrentSetSentence, generateCurrentSetSentence } from "./genera
 export { deleteGeneration, type DeleteGenerationResult } from "./delete-generation";
 export {
   countDoneGenerationsSince,
+  countUnfinishedGenerations,
   getDoneGenerationDetails,
   listActiveWordUsages,
   listDoneGenerations,

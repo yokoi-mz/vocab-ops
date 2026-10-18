@@ -1,5 +1,6 @@
 import { recoverInterruptedGenerations, runNextGeneration } from "@/features/generation";
 import { enqueueVocabUpdateIfDue, recoverInterruptedVocabUpdates, runNextVocabUpdate } from "@/features/vocab-ops";
+import { recordOpsEvent } from "@/shared/ops-log";
 
 const idleWaitMs = 1000;
 
@@ -9,6 +10,7 @@ async function main(): Promise<void> {
   recoverInterruptedGenerations();
   recoverInterruptedVocabUpdates();
   console.log("ワーカーを起動しました。待ちの文生成と語彙更新を処理します。");
+  recordOpsEvent({ language: null, source: "worker", referenceId: null, message: "ワーカーを起動した" });
 
   for (;;) {
     const generation = await runNextGeneration();

@@ -33,9 +33,9 @@ export const vocabOpsSettings = {
 
 export type VocabOpsSettings = typeof vocabOpsSettings;
 
-// 画面で選べる増減モード。最初は「増やす」だけ（04-vocab-size-mode.md）。
-// 削除候補が出るほど履歴がたまったら、"keep" と "decrease" を足す。
-export const selectableVocabSizeModes: VocabSizeMode[] = ["increase"];
+// 画面で選べる増減モード（04-vocab-size-mode.md）。
+// 「減らす」は、削除候補が出るほど履歴がたまったら足す。
+export const selectableVocabSizeModes: VocabSizeMode[] = ["increase", "keep"];
 
 // 語彙更新で使う AI のモデル（追加候補の順位付け、語彙更新検証の比較判定）
 export const vocabOpsModel = "deepseek/deepseek-v4.1-flash";

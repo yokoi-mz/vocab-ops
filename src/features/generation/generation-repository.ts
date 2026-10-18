@@ -135,6 +135,14 @@ export function countDoneGenerationsAfter(db: DatabaseSync, language: string, af
   ).count;
 }
 
+export function countGenerationsByStatus(db: DatabaseSync, language: string, statuses: GenerationStatus[]): number {
+  return z.object({ count: z.number() }).parse(
+    db
+      .prepare(`SELECT COUNT(*) AS count FROM generations WHERE language = ? AND status IN (${statuses.map(() => "?").join(", ")})`)
+      .get(language, ...statuses),
+  ).count;
+}
+
 // 完了した文生成の番号と通し番号を、新しい順に返す。
 export function listDoneGenerationRefs(db: DatabaseSync, language: string): { id: number; seq: number }[] {
   return db

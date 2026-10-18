@@ -21,10 +21,12 @@ export function listVoices(lang: string): SpeechSynthesisVoice[] {
     (/premium|enhanced|natural/i.test(voice.name) ? 4 : 0) +
     (/google/i.test(voice.name) ? 2 : 0) +
     (voice.localService ? 1 : 0);
-  return window.speechSynthesis
+  const sorted = window.speechSynthesis
     .getVoices()
     .filter((voice) => normalizeLang(voice.lang).startsWith(language) && !noveltyVoicePattern.test(voice.name))
     .sort((a, b) => score(b) - score(a));
+  // ブラウザによっては、同じ名前の声が2回入っていることがある（例：Moira）。声は名前で選ぶので、名前ごとに1つにする
+  return sorted.filter((voice, index) => sorted.findIndex((other) => other.name === voice.name) === index);
 }
 
 // 読み上げる。voiceName があればその声を、なければ（または見つからなければ）おすすめの順の最初の声を使う。

@@ -5,7 +5,14 @@ export {
   type ApplyVocabUpdateResult,
   type VocabChangeRequest,
 } from "./apply-vocab-update";
-export { getVocabulary, getWordsByIds, listImportedLanguages, type Vocabulary } from "./get-vocabulary";
+export {
+  getActiveVocabSizeHistory,
+  getVocabulary,
+  getWordsByIds,
+  listImportedLanguages,
+  type ActiveVocabSizePoint,
+  type Vocabulary,
+} from "./get-vocabulary";
 export { importBaseline } from "./import-baseline";
 export { changeLanguageSettings } from "./language-settings";
 export {

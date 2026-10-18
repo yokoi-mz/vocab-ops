@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const tabs = [
   { href: "/generate", label: "文生成", matches: (path: string) => path.startsWith("/generate") },
   { href: "/", label: "語彙", matches: (path: string) => path === "/" || path.startsWith("/vocabulary") },
+  { href: "/ops", label: "Ops", matches: (path: string) => path.startsWith("/ops") },
   { href: "/settings", label: "設定", matches: (path: string) => path.startsWith("/settings") },
 ];
 

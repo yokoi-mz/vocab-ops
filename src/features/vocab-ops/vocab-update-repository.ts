@@ -169,6 +169,7 @@ const vocabUpdateRowSchema = z.object({
   cost_usd: z.number().nullable(),
   error: z.string().nullable(),
   created_at: z.string(),
+  started_at: z.string().nullable(),
   finished_at: z.string().nullable(),
 });
 
@@ -189,35 +190,41 @@ export type VocabUpdate = {
   costUsd: number | null;
   error: string | null;
   createdAt: string;
+  startedAt: string | null;
   finishedAt: string | null;
 };
 
+export function findVocabUpdate(db: DatabaseSync, id: number): VocabUpdate | undefined {
+  const row = db.prepare("SELECT * FROM vocab_updates WHERE id = ?").get(id);
+  return row === undefined ? undefined : toVocabUpdate(row);
+}
+
 export function listVocabUpdates(db: DatabaseSync, language: string, limit: number): VocabUpdate[] {
-  return db
-    .prepare("SELECT * FROM vocab_updates WHERE language = ? ORDER BY id DESC LIMIT ?")
-    .all(language, limit)
-    .map((row) => {
-      const update = vocabUpdateRowSchema.parse(row);
-      return {
-        id: update.id,
-        language: update.language,
-        status: update.status,
-        triggerGenerationSeq: update.trigger_generation_seq,
-        vocabSizeMode: update.vocab_size_mode,
-        versionBefore: update.version_before,
-        versionAfter: update.version_after,
-        validationPerformed: update.validation_performed === 1,
-        improvedCount: update.improved_count,
-        worsenedCount: update.worsened_count,
-        sameCount: update.same_count,
-        outcome: update.outcome,
-        outcomeReason: update.outcome_reason,
-        costUsd: update.cost_usd,
-        error: update.error,
-        createdAt: update.created_at,
-        finishedAt: update.finished_at,
-      };
-    });
+  return db.prepare("SELECT * FROM vocab_updates WHERE language = ? ORDER BY id DESC LIMIT ?").all(language, limit).map(toVocabUpdate);
+}
+
+function toVocabUpdate(row: unknown): VocabUpdate {
+  const update = vocabUpdateRowSchema.parse(row);
+  return {
+    id: update.id,
+    language: update.language,
+    status: update.status,
+    triggerGenerationSeq: update.trigger_generation_seq,
+    vocabSizeMode: update.vocab_size_mode,
+    versionBefore: update.version_before,
+    versionAfter: update.version_after,
+    validationPerformed: update.validation_performed === 1,
+    improvedCount: update.improved_count,
+    worsenedCount: update.worsened_count,
+    sameCount: update.same_count,
+    outcome: update.outcome,
+    outcomeReason: update.outcome_reason,
+    costUsd: update.cost_usd,
+    error: update.error,
+    createdAt: update.created_at,
+    startedAt: update.started_at,
+    finishedAt: update.finished_at,
+  };
 }
 
 const proposalWordRowSchema = z.object({
@@ -251,4 +258,102 @@ export function listProposalWords(db: DatabaseSync, vocabUpdateIds: number[]): P
       const word = proposalWordRowSchema.parse(row);
       return { vocabUpdateId: word.vocab_update_id, candidateType: word.candidate_type, lemma: word.lemma, meaning: word.meaning };
     });
+}
+
+const candidateRowSchema = z.object({
+  vocab_update_id: z.number(),
+  candidate_type: z.enum(["addition", "removal"]),
+  rank: z.number(),
+  lemma: z.string(),
+  meaning: z.string().nullable(),
+  reason: z.string().nullable(),
+  evidence_json: z.string().nullable(),
+  in_proposal: z.number(),
+});
+
+export type CandidateRecord = {
+  vocabUpdateId: number;
+  candidateType: CandidateType;
+  rank: number;
+  lemma: string;
+  meaning: string | null;
+  reason: string | null;
+  // 追加候補の出現回数（語彙更新のときの集計。削除候補では null）
+  occurrences: number | null;
+  inProposal: boolean;
+};
+
+export function listCandidates(db: DatabaseSync, vocabUpdateIds: number[]): CandidateRecord[] {
+  if (vocabUpdateIds.length === 0) {
+    return [];
+  }
+  return db
+    .prepare(`
+      SELECT c.vocab_update_id, c.candidate_type, c.rank, w.lemma, w.meaning, c.reason, c.evidence_json, c.in_proposal
+      FROM vocab_update_candidates c JOIN words w ON w.id = c.word_id
+      WHERE c.vocab_update_id IN (${vocabUpdateIds.map(() => "?").join(", ")})
+      ORDER BY c.vocab_update_id, c.candidate_type, c.rank
+    `)
+    .all(...vocabUpdateIds)
+    .map((row) => {
+      const candidate = candidateRowSchema.parse(row);
+      return {
+        vocabUpdateId: candidate.vocab_update_id,
+        candidateType: candidate.candidate_type,
+        rank: candidate.rank,
+        lemma: candidate.lemma,
+        meaning: candidate.meaning,
+        reason: candidate.reason,
+        occurrences: occurrencesOf(candidate.candidate_type, candidate.evidence_json),
+        inProposal: candidate.in_proposal === 1,
+      };
+    });
+}
+
+const validationRowSchema = z.object({
+  vocab_update_id: z.number(),
+  current_set_sentence: z.string(),
+  current_set_reused: z.number(),
+  proposed_set_sentence: z.string(),
+  judgement: z.enum(["improved", "worsened", "same"]).nullable(),
+});
+
+export type ValidationRecord = {
+  vocabUpdateId: number;
+  currentSetSentence: string;
+  currentSetReused: boolean;
+  proposedSetSentence: string;
+  judgement: ValidationJudgement | null;
+};
+
+export function listValidations(db: DatabaseSync, vocabUpdateIds: number[]): ValidationRecord[] {
+  if (vocabUpdateIds.length === 0) {
+    return [];
+  }
+  return db
+    .prepare(`
+      SELECT vocab_update_id, current_set_sentence, current_set_reused, proposed_set_sentence, judgement
+      FROM vocab_update_validations
+      WHERE vocab_update_id IN (${vocabUpdateIds.map(() => "?").join(", ")})
+      ORDER BY vocab_update_id, id
+    `)
+    .all(...vocabUpdateIds)
+    .map((row) => {
+      const validation = validationRowSchema.parse(row);
+      return {
+        vocabUpdateId: validation.vocab_update_id,
+        currentSetSentence: validation.current_set_sentence,
+        currentSetReused: validation.current_set_reused === 1,
+        proposedSetSentence: validation.proposed_set_sentence,
+        judgement: validation.judgement,
+      };
+    });
+}
+
+function occurrencesOf(candidateType: CandidateType, evidenceJson: string | null): number | null {
+  if (candidateType !== "addition" || evidenceJson === null) {
+    return null;
+  }
+  const parsed = z.object({ occurrences: z.number().optional() }).safeParse(JSON.parse(evidenceJson));
+  return parsed.success ? (parsed.data.occurrences ?? null) : null;
 }

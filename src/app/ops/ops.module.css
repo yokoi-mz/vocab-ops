@@ -1,0 +1,547 @@
+/* ---- 上部 ---- */
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 18px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tabs a {
+  padding: 6px 12px;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tabs a[aria-current="page"] {
+  border-bottom-color: var(--color-pink);
+  color: var(--color-text);
+}
+
+.refresh {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.refreshButton {
+  padding: 6px 16px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.refreshButton:hover {
+  border-color: var(--color-sky);
+  color: var(--color-text);
+}
+
+.backLink {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--color-text);
+}
+
+/* ---- 数字のカード ---- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+}
+
+.cardLabel {
+  color: var(--color-text-faint);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.cardValue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.cardValue strong {
+  color: var(--color-mint);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.cardSub {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.gauge {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(167 139 250 / 0.15);
+}
+
+.gaugeFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-mint), var(--color-lavender));
+}
+
+/* ---- 区画 ---- */
+
+.section {
+  margin-bottom: 16px;
+  padding: 16px 20px;
+}
+
+.sectionTitle {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.groupTitle {
+  margin: 28px 4px 10px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+  gap: 0 16px;
+}
+
+.note {
+  margin: -4px 0 10px;
+  color: var(--color-text-faint);
+  font-size: 12px;
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.right {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.lemma {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lemma > span {
+  margin-left: 6px;
+}
+
+/* ---- 表 ---- */
+
+.table,
+.runTable,
+.logTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th,
+.runTable th {
+  padding: 4px 10px 6px 0;
+  color: var(--color-text-faint);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.table td,
+.runTable td,
+.logTable td {
+  padding: 7px 10px 7px 0;
+  border-top: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.runTable tbody tr:hover,
+.logTable tbody tr:hover {
+  background: var(--color-hover);
+}
+
+.runLink {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+/* ---- 状態の印 ---- */
+
+.badge {
+  display: inline-block;
+  padding: 1px 10px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badgeSuccess {
+  border-color: rgb(143 217 200 / 0.5);
+  background: rgb(143 217 200 / 0.1);
+  color: var(--color-mint);
+}
+
+.badgeNeutral {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-muted);
+}
+
+.badgeDanger {
+  border-color: rgb(255 107 107 / 0.5);
+  background: rgb(255 107 107 / 0.08);
+  color: var(--color-outside);
+}
+
+.badgeRunning {
+  border-color: rgb(147 201 230 / 0.5);
+  background: rgb(147 201 230 / 0.1);
+  color: var(--color-sky);
+}
+
+.wordChanges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.added,
+.removed {
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.added {
+  background: rgb(143 217 200 / 0.14);
+  color: var(--color-mint);
+}
+
+.removed {
+  background: rgb(255 107 107 / 0.12);
+  color: var(--color-outside);
+}
+
+/* ---- 語彙更新の詳細 ---- */
+
+.runTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.runTitle h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.runFacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px 20px;
+  margin: 16px 0 0;
+}
+
+.runFacts dt {
+  color: var(--color-text-faint);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.runFacts dd {
+  margin: 2px 0 0;
+}
+
+.runReason {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-small);
+  background: rgb(10 8 24 / 0.4);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  border-top: 1px solid var(--color-border);
+}
+
+.stepSummary {
+  display: grid;
+  grid-template-columns: 28px 130px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 4px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.stepSummary::-webkit-details-marker {
+  display: none;
+}
+
+.stepSummary:hover {
+  background: var(--color-hover);
+}
+
+.stepIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stepLabel {
+  font-weight: 700;
+}
+
+.stepBrief {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stepDuration {
+  color: var(--color-text-faint);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.step_done .stepIcon {
+  background: rgb(143 217 200 / 0.18);
+  color: var(--color-mint);
+}
+
+.step_skipped .stepIcon,
+.step_pending .stepIcon {
+  background: rgb(166 159 208 / 0.12);
+  color: var(--color-text-faint);
+}
+
+.step_skipped .stepLabel,
+.step_pending .stepLabel {
+  color: var(--color-text-muted);
+}
+
+.step_failed .stepIcon {
+  background: rgb(255 107 107 / 0.18);
+  color: var(--color-outside);
+}
+
+.step_running .stepIcon {
+  background: rgb(147 201 230 / 0.18);
+  color: var(--color-sky);
+}
+
+.stepBody {
+  padding: 4px 4px 14px 42px;
+}
+
+.stepMessages {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/* ---- 動きの記録 ---- */
+
+.logFilter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.logTime {
+  width: 1%;
+  color: var(--color-text-faint);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.logAction {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 14px;
+  border: 1px solid rgb(147 201 230 / 0.55);
+  border-radius: 8px;
+  background: rgb(147 201 230 / 0.16);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 2px 6px rgb(0 0 0 / 0.25);
+  color: var(--color-sky);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.actionLink:hover {
+  background: rgb(147 201 230 / 0.28);
+  transform: translateY(-1px);
+}
+
+.actionLink:active {
+  transform: translateY(0);
+}
+
+.source {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.source_worker {
+  background: rgb(166 159 208 / 0.15);
+  color: var(--color-text-muted);
+}
+
+.source_generation {
+  background: rgb(147 201 230 / 0.15);
+  color: var(--color-sky);
+}
+
+.source_vocab_update {
+  background: rgb(242 155 216 / 0.15);
+  color: var(--color-pink);
+}
+
+.cardLink {
+  color: var(--color-text);
+  text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.cardLink:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+  gap: 16px 24px;
+}
+
+.compareTitle {
+  margin: 0 0 6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.subLine {
+  display: block;
+  color: var(--color-text-faint);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* ---- 語数のグラフ ---- */
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chartGrid {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.chartLabel {
+  fill: var(--color-text-faint);
+  font-size: 11px;
+}
+
+.chartPoint {
+  fill: var(--color-background);
+  stroke: var(--color-mint);
+  stroke-width: 2.5;
+}
+
+.chartCurrent {
+  fill: var(--color-lavender);
+}
+
+.chartPointLabel {
+  fill: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}

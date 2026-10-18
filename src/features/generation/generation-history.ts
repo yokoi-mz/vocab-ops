@@ -1,6 +1,7 @@
 import { getDatabase } from "@/shared/db";
 import {
   countDoneGenerationsAfter,
+  countGenerationsByStatus,
   findGeneration,
   listDoneGenerationRefs,
   listSentences,
@@ -42,4 +43,9 @@ export function getDoneGenerationDetails(ids: number[]): GenerationDetail[] {
     const generation = findGeneration(db, id);
     return generation === undefined || generation.status !== "done" ? [] : [{ ...generation, sentences: listSentences(db, id) }];
   });
+}
+
+// 待ち・実行中の文生成の数（Ops の画面に表示する）。
+export function countUnfinishedGenerations(language: string): number {
+  return countGenerationsByStatus(getDatabase(), language, ["pending", "running"]);
 }

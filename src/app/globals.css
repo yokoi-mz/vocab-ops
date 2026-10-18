@@ -56,8 +56,10 @@ textarea {
   background: rgb(255 122 217 / 0.35);
 }
 
+/* 下線は使わない。リンクは色で見分ける */
 a {
   color: var(--color-sky);
+  text-decoration: none;
 }
 
 h1 {

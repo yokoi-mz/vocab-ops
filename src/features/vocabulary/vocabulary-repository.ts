@@ -246,3 +246,42 @@ export function saveOutsideWord(
     db.prepare("SELECT id FROM words WHERE language = ? AND lemma_key = ?").get(word.language, word.lemmaKey),
   ).id;
 }
+
+const versionRowSchema = z.object({
+  version: z.number(),
+  generation_seq: z.number(),
+  added: z.number(),
+  removed: z.number(),
+  created_at: z.string(),
+});
+
+export type ActiveVocabVersion = {
+  version: number;
+  // その版になったときの、文生成の通し番号
+  generationSeq: number;
+  added: number;
+  removed: number;
+  createdAt: string;
+};
+
+// 手札語彙の版ごとに、足した語の数・外した語の数を、古い順に返す。
+export function listActiveVocabVersions(db: DatabaseSync, language: string): ActiveVocabVersion[] {
+  return db
+    .prepare(`
+      SELECT version, MIN(generation_seq) AS generation_seq,
+        SUM(change = 'added') AS added, SUM(change = 'removed') AS removed, MIN(created_at) AS created_at
+      FROM active_vocab_changes WHERE language = ?
+      GROUP BY version ORDER BY version
+    `)
+    .all(language)
+    .map((row) => {
+      const version = versionRowSchema.parse(row);
+      return {
+        version: version.version,
+        generationSeq: version.generation_seq,
+        added: version.added,
+        removed: version.removed,
+        createdAt: version.created_at,
+      };
+    });
+}

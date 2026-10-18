@@ -1,5 +1,6 @@
 import { getVocabSnapshot, registerOutsideWord, takeNextGenerationSeq } from "@/features/vocabulary";
 import { getDatabase } from "@/shared/db";
+import { recordOpsEvent } from "@/shared/ops-log";
 import { generateSentence, SentenceGenerationError, type SentenceResult } from "./generate-sentence";
 import {
   claimNextPendingGeneration,
@@ -95,6 +96,7 @@ async function generateWithVocab(generation: ClaimedGeneration): Promise<void> {
     if (failure !== undefined) {
       const reason = failure.reason instanceof Error ? failure.reason.message : String(failure.reason);
       failGeneration(db, generation.id, reason, costUsd);
+      recordFailure(generation, reason);
       return;
     }
 
@@ -111,9 +113,45 @@ async function generateWithVocab(generation: ClaimedGeneration): Promise<void> {
       db.exec("ROLLBACK");
       throw error;
     }
+    recordSuccess(generation, sentenceTypes, results, costUsd);
   } catch (error) {
-    failGeneration(db, generation.id, error instanceof Error ? error.message : String(error), 0);
+    const reason = error instanceof Error ? error.message : String(error);
+    failGeneration(db, generation.id, reason, 0);
+    recordFailure(generation, reason);
   }
+}
+
+// Ops の画面のための記録。言いたいことや文の中身は書かない。
+function recordSuccess(
+  generation: ClaimedGeneration,
+  sentenceTypes: SentenceType[],
+  results: PromiseSettledResult<SentenceResult>[],
+  costUsd: number,
+): void {
+  const parts = results.map((result, index) => {
+    if (result.status !== "fulfilled") {
+      return "";
+    }
+    const name = sentenceTypes[index] === "current_set" ? "手札語彙文" : "拡張語彙文";
+    const passed = result.value.unresolvedProblems === null ? `${result.value.attempts}回目で採点に合格` : `${result.value.attempts}回作らせても採点に不合格`;
+    const outside = result.value.judgement.outsideLemmas;
+    return `${name}：${passed}${outside.length > 0 ? `・手札外語彙 ${outside.join(", ")}` : ""}`;
+  });
+  recordOpsEvent({
+    language: generation.language,
+    source: "generation",
+    referenceId: generation.id,
+    message: `文生成 ${generation.seq} 回目が完了（${parts.join("／")}・約 ${(costUsd * 150).toFixed(1)} 円）`,
+  });
+}
+
+function recordFailure(generation: ClaimedGeneration, reason: string): void {
+  recordOpsEvent({
+    language: generation.language,
+    source: "generation",
+    referenceId: generation.id,
+    message: `文生成 ${generation.seq} 回目が失敗：${reason}`,
+  });
 }
 
 function saveSentence(generation: ClaimedGeneration, sentenceType: SentenceType, result: SentenceResult): void {

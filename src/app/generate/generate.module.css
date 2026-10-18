@@ -104,10 +104,10 @@
 }
 
 .outsideWord {
+  padding: 0 3px;
+  border-radius: 4px;
+  background: rgb(255 107 107 / 0.14);
   color: var(--color-outside);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
 }
 
 .labelRow {
