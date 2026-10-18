@@ -2,11 +2,11 @@ import { getLanguageRules, type SentenceProblem } from "@/features/language";
 import type { SentenceType, Speaker } from "./generation-repository";
 
 // プロンプトを変えたら、この版を進める。文生成の記録に残し、語彙更新検証で保存済みの文を使い回せるかの判断に使う。
-export const promptVersion = "2026-10-18.2";
+export const promptVersion = "2026-10-19.1";
 
 export const systemPrompt = `You are a speaking-simulation engine for a language learner.
-The learner may only use a limited set of lemmas. Your job is to express what they want to say
-in the target language while respecting a strict budget of NEW lemmas (lemmas not in their lists).
+The learner may only use a limited set of words. Your job is to express what they want to say
+in the target language while respecting a strict budget of NEW words (words that are not in their ALLOWED WORDS list).
 Output ONLY one JSON object. No prose, no markdown, no code fences.`;
 
 export type PromptInput = {
@@ -29,15 +29,21 @@ const speakerRules: Record<Speaker, string> = {
 
 function goal(sentenceType: SentenceType, outsideWordLimit: number): string {
   if (sentenceType === "current_set") {
-    return `GOAL: use ZERO new lemmas. Only BASIC and ACTIVE lemmas.
-Priority: get the original meaning across somehow, even if unnatural.
-If something cannot be said directly: split into several short sentences, simplify, paraphrase descriptively,
-take a detour, or give up minor nuances.`;
+    return `GOAL: use ZERO new words. Write the sentence only with words from the ALLOWED WORDS list.
+Priority: a listener should understand what the original says.
+- Keep the main action and the key place, thing, person and time.
+- If the list has no word for something important, describe it in a few words from the list,
+  so that a listener can tell what it is. Do not explain at length.
+- One or two simple sentences.
+- Small details may be dropped, but never change the meaning, and never add information that is not in the original.
+- Before you finish, check every word: if its dictionary form is not in the ALLOWED WORDS list, replace it.`;
   }
-  return `GOAL: you may use at most ${outsideWordLimit} new lemmas (use fewer, or 0, if enough).
-Priority: keep the original meaning more precisely, sound natural, keep needed nuances, be less roundabout.
-Choose new lemmas that are versatile and high-frequency (useful in many future situations),
-not rare or unnecessarily advanced words. This is NOT unrestricted translation.`;
+  return `GOAL: you may use at most ${outsideWordLimit} new words (words that are not in the ALLOWED WORDS list).
+Priority: express the original meaning accurately and naturally, as a fluent speaker would.
+- Use a new word whenever it makes the meaning clearer or more precise, especially for specific places, things and actions
+  that the allowed words can only paraphrase vaguely. Do not avoid a useful new word just to keep the count low.
+- Prefer versatile, high-frequency new words (useful in many future situations), not rare or advanced words.
+- If you would need more than ${outsideWordLimit} new words, keep the most important ones and paraphrase the rest with allowed words.`;
 }
 
 // 毎回変わらない部分（語彙の一覧とルール）を前に、言いたいことを最後に置く。
@@ -47,7 +53,7 @@ export function buildPrompt(input: PromptInput): string {
   const language = rules.englishName;
   const tokenRules = [
     '- Contractions (du, au, des, nel, della, im, zum, del, al ...): one token, lemma = the preposition (de, à, in, di, zu, a ...).',
-    '- A multi-word entry from the lists (e.g. "parce que", "s\'il te plaît", "avoir besoin de", "excuse me") may be one token whose lemma is exactly the listed entry.',
+    '- A multi-word entry from the ALLOWED WORDS list (e.g. "parce que", "s\'il te plaît", "avoir besoin de", "excuse me") may be one token whose lemma is exactly the listed entry.',
     "- Reflexive verbs: lemma without the reflexive pronoun is fine; the pronoun is its own token.",
     ...rules.tokenRules.map((rule) => `- ${rule}`),
   ].join("\n");
@@ -55,28 +61,30 @@ export function buildPrompt(input: PromptInput): string {
 
   const prompt = `TARGET LANGUAGE: ${language}
 
-== BASIC LEMMAS (${language}) ==
+== ALLOWED WORDS FOR THIS SENTENCE (${language}) ==
+These are the words you may use to write this sentence (dictionary forms).
+Content words (word: meaning):
+${input.activeWords.map((word) => `${word.lemma}: ${word.meaning ?? ""}`).join("\n")}
+Function words:
 ${input.uncountedLemmas.join(", ")}
 
-== ACTIVE LEMMAS (${language}) — lemma: meaning ==
-${input.activeWords.map((word) => `${word.lemma}: ${word.meaning ?? ""}`).join("\n")}
-
 == VOCABULARY RULES ==
-- Allowed without cost = BASIC lemmas ∪ ACTIVE lemmas (lists above).
-- Any inflected/conjugated/agreed form of an allowed lemma is free (e.g. lemma "aller" allows "vais", "allé", "irai").
-  Any grammar is allowed (subjunctive, conditional, past tenses...). Only lemmas are restricted.
-- Any lemma not in the lists is NEW. Count = number of DISTINCT new lemmas (not surface forms).
+- Any word in the ALLOWED WORDS list may be used freely, in any inflected/conjugated/agreed form
+  (e.g. "aller" allows "vais", "allé", "irai"). Any grammar is allowed (subjunctive, conditional, past tenses...).
+  Only the words themselves are restricted.
+- A word whose dictionary form is not in the ALLOWED WORDS list is a NEW word.
+  Count = number of DISTINCT new words (by dictionary form, not surface form).
 - Proper nouns (names of people, places, countries, brands) are free: mark them kind "proper_noun".
 - Numbers written with digits (6, 2024) are free: kind "number". Numbers written as words are normal words.
 
 == GRAMMAR ==
 The expression must be grammatically correct ${language}. Unnatural or simple is OK; wrong grammar is not.
-The vocabulary limit restricts WHICH lemmas you use, never HOW you inflect them: if the correct form needs an allowed lemma
+The vocabulary limit restricts WHICH words you use, never HOW you inflect them: if the correct form needs an allowed word
 (e.g. an auxiliary, an article, an agreement ending), you must use the correct form.
 Check especially: ${rules.grammarChecks}
 Workflow:
 1. write "draft".
-2. "vocab_check": list every content lemma of the draft that is NOT in the BASIC/ACTIVE lists (these are NEW). If there are more than the budget allows, rewrite the draft with allowed lemmas / paraphrase until it fits.
+2. "vocab_check": list every content word of the draft whose dictionary form is NOT in the ALLOWED WORDS list (these are NEW). If there are more than the budget allows, rewrite the draft with allowed words / paraphrase until it fits.
 3. "grammar_check": list each grammar error you find and its fix.
 4. write the corrected final "expression".
 
@@ -91,17 +99,17 @@ ${tokenRules}
 == OUTPUT JSON ==
 {
   "draft": "first version of the ${language} text",
-  "vocab_check": "NEW lemmas in the draft and how you removed/kept them within the budget",
+  "vocab_check": "NEW words in the draft and how you removed/kept them within the budget",
   "grammar_check": "short English notes: each grammar error found and how it was fixed (or 'no errors')",
   "expression": "the corrected ${language} text the learner would actually say",
   "tokens": [{ "surface": "...", "lemma": "...", "meaning": "...", "kind": "word", "pos": "verb" }],
   "full_translation": "natural Japanese translation of what the expression ACTUALLY conveys (so the learner can see what meaning survived), not the original request",
-  "comment": "1-2 short Japanese sentences about MEANING only: what you worked around, what nuance was lost, or what the new lemmas made expressible. Do not talk about counts or rules."
+  "comment": "1-2 short Japanese sentences about MEANING only: what you worked around, what nuance was lost, or what the new words made expressible. Do not talk about counts or rules."
 }
 
 == THIS REQUEST ==
 ${goal(input.sentenceType, budget)}
-NEW lemma budget: ${budget}. Do not exceed it.
+NEW word budget: ${budget}. Do not exceed it.
 ${rules.hasSpeakerGender ? `\nSPEAKER: ${speakerRules[input.speaker]}\n` : ""}
 SITUATION (may be empty): ${input.situation || "(none)"}
 
@@ -128,7 +136,7 @@ export function buildFeedback(previousExpression: string | null, problems: Sente
     if (problem.type === "suspicious_lemmas") {
       const pairs = problem.tokens.map((token) => `"${token.surface}" → "${token.lemma}"`).join(", ");
       lines.push(
-        `These lemmas look wrong: ${pairs}. Give the real dictionary form of each word. If that lemma is not in the lists, it is NEW.`,
+        `These dictionary forms look wrong: ${pairs}. Give the real dictionary form of each word. If that dictionary form is not in the ALLOWED WORDS list, it is a NEW word.`,
       );
     }
     if (problem.type === "missing_tokens") {
@@ -136,7 +144,7 @@ export function buildFeedback(previousExpression: string | null, problems: Sente
     }
     if (problem.type === "too_many_outside_words") {
       lines.push(
-        `You used ${problem.outsideLemmas.length} new lemmas (${problem.outsideLemmas.join(", ")}), but the limit is ${problem.limit}. Replace some of them with BASIC/ACTIVE lemmas or paraphrase.`,
+        `You used ${problem.outsideLemmas.length} new words (${problem.outsideLemmas.join(", ")}), but the limit is ${problem.limit}. Replace them with words from the ALLOWED WORDS list or paraphrase.`,
       );
     }
   }

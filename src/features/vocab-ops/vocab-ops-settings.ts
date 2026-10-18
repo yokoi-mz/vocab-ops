@@ -41,4 +41,4 @@ export const selectableVocabSizeModes: VocabSizeMode[] = ["increase"];
 export const vocabOpsModel = "deepseek/deepseek-v4.1-flash";
 
 // 語彙更新のプロンプトを変えたら、この版を進める
-export const vocabOpsPromptVersion = "2026-10-18.1";
+export const vocabOpsPromptVersion = "2026-10-18.2";

@@ -30,7 +30,9 @@ export async function callOpenRouter(model: string, messages: ChatMessage[]): Pr
     throw new OpenRouterError("環境変数 OPENROUTER_API_KEY がありません。.env.local に書いてください。");
   }
 
+  // 時間切れは、返事の本文を読んでいる途中にも起きるので、本文を読み終えるまでを try で囲む
   let response: Response;
+  let body: string;
   try {
     response = await fetch(endpoint, {
       method: "POST",
@@ -47,16 +49,22 @@ export async function callOpenRouter(model: string, messages: ChatMessage[]): Pr
       }),
       signal: AbortSignal.timeout(timeoutMs),
     });
+    body = await response.text();
   } catch (error) {
     throw new OpenRouterError(`OpenRouter を呼べませんでした：${error instanceof Error ? error.message : String(error)}`);
   }
 
   if (!response.ok) {
-    const body = await response.text();
     throw new OpenRouterError(`OpenRouter がエラーを返しました（${response.status}）：${body.slice(0, 500)}`);
   }
 
-  const parsed = responseSchema.safeParse(await response.json());
+  let json: unknown;
+  try {
+    json = JSON.parse(body);
+  } catch {
+    throw new OpenRouterError("OpenRouter の返事を JSON として読めませんでした。");
+  }
+  const parsed = responseSchema.safeParse(json);
   if (!parsed.success) {
     throw new OpenRouterError("OpenRouter の返事の形が想定と違います。");
   }

@@ -165,12 +165,21 @@ async function judgeBatch(pairs: ValidationPair[]): Promise<{ judgements: (Valid
         : [pair.proposedSetSentence, pair.currentSetSentence];
     return `Problem ${index + 1}\nOriginal: ${pair.message}\nSentence 1: ${first}\nSentence 2: ${second}`;
   });
-  const prompt = `For each problem, compare which sentence conveys the ORIGINAL meaning (Japanese) more faithfully.
-Judge ONLY how accurately the meaning is preserved. Do not judge naturalness, style or length.
-Answer "1" if sentence 1 is more faithful, "2" if sentence 2 is more faithful, or "same" if there is no substantial difference.
+  const prompt = `A language learner wanted to say the ORIGINAL (Japanese). Two sentences try to express it in a foreign language.
+For each problem, decide which sentence lets a listener understand the ORIGINAL more accurately and completely.
 
+How to judge:
+- Specific information matters most: places, things, people, times, actions, amounts.
+  A sentence that names them (e.g. "station", "train", "meeting", "wait") is MORE faithful than one that replaces them
+  with a vague paraphrase (e.g. "the place where we get on and get down", "the thing we take", "a place where we speak together").
+- Information that is missing or changed makes a sentence LESS faithful (e.g. "airport" became "station", "coffee" became "this").
+- Information that is not in the original, added to the sentence, makes it LESS faithful.
+- Do NOT judge grammar, naturalness, style or length, except when they make the meaning unclear.
+- Answer "same" only when a listener would understand essentially the same thing from both sentences.
+
+For each problem, first write a short reason in English, then the answer: "1" (sentence 1 is more faithful), "2" (sentence 2 is more faithful) or "same".
 Output ONLY one JSON object, no prose:
-{"answers": [{"problem": 1, "answer": "1"}, {"problem": 2, "answer": "same"}]}
+{"answers": [{"problem": 1, "reason": "...", "answer": "1"}, {"problem": 2, "reason": "...", "answer": "same"}]}
 
 ${problems.join("\n\n")}`;
 

@@ -82,8 +82,10 @@ function findMissingWords(language: string, sentence: string, tokens: AnswerToke
   return [...new Set(missing)];
 }
 
-// チェック C：表層形が4文字以上、辞書形が4文字以下、頭文字が違い、表層形が辞書形を含まないものを疑う。
-// 例：Ding → kein は疑う。言語ごとの例外（suis → être、went → go など）は疑わない。
+// チェック C：辞書形の取り違えが疑われるものを見つける。次のどちらかなら疑う。
+//   1. 表層形が4文字以上、辞書形が4文字以下、頭文字が違い、表層形が辞書形を含まない（例：Ding → kein）
+//   2. 表層形が「辞書形＋語形変化ではない文字」になっている（例：weekend → week）。語尾の一覧がある言語だけ
+// 言語ごとの例外（suis → être、went → go など）は疑わない。
 function isSuspiciousLemma(language: string, token: AnswerToken): boolean {
   const surface = normalizeLemma(token.surface);
   const lemma = normalizeLemma(token.lemma);
@@ -94,5 +96,16 @@ function isSuspiciousLemma(language: string, token: AnswerToken): boolean {
   if (rules.irregularForms.some(([form, formLemma]) => form === surface && formLemma === lemma)) {
     return false;
   }
+  if (rules.inflectionSuffixes !== null && surface !== lemma && surface.startsWith(lemma)) {
+    return !isInflectionSuffix(surface.slice(lemma.length), lemma, rules.inflectionSuffixes);
+  }
   return surface.length >= 4 && lemma.length <= 4 && surface[0] !== lemma[0] && !surface.includes(lemma);
+}
+
+// 辞書形の後ろに付いた文字が、語形変化の語尾か。子音を重ねる形（stop → stopped）も語尾とみなす。
+function isInflectionSuffix(rest: string, lemma: string, suffixes: string[]): boolean {
+  if (suffixes.includes(rest)) {
+    return true;
+  }
+  return rest.length >= 2 && rest[0] === lemma.at(-1) && suffixes.includes(rest.slice(1));
 }

@@ -20,6 +20,10 @@ export type LanguageRules = {
   irregularLemmas: string[];
   // チェック C で疑わない「表層形 → 辞書形」の組（比較級、代名詞の格変化、不規則動詞など）
   irregularForms: [string, string][];
+  // 語形変化で辞書形の後ろに付く語尾（英語の -s、-ed、-ing など）。
+  // 表層形が「辞書形＋これ以外の文字」なら、別の語（weekend を week と書き出したなど）として疑う。
+  // null の言語では、この確認をしない（語形変化で語幹が変わる言語が多く、語尾だけで判断できないため）
+  inflectionSuffixes: string[] | null;
 };
 
 const defaultRules: LanguageRules = {
@@ -33,6 +37,7 @@ const defaultRules: LanguageRules = {
   suffixReplacements: [],
   irregularLemmas: [],
   irregularForms: [],
+  inflectionSuffixes: null,
 };
 
 const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
@@ -61,7 +66,12 @@ const rulesByLanguage: Record<string, Partial<LanguageRules>> = {
       ["herself", "she"],
       ["ours", "we"],
       ["ourselves", "we"],
+      ["cannot", "can"],
+      ["done", "do"],
+      ["gone", "go"],
+      ["children", "child"],
     ],
+    inflectionSuffixes: ["s", "es", "d", "ed", "t", "ing", "er", "est", "ly", "n", "en", "n't", "'s", "'re", "'ll", "'ve", "'m", "'d"],
   },
   fr: {
     englishName: "French",

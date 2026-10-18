@@ -98,3 +98,32 @@ for (const [language, surface, lemma] of [
     assert.deepEqual(suspiciousPairs(language, surface, lemma), []);
   });
 }
+
+for (const [surface, lemma] of [
+  ["weekend", "week"],
+  ["into", "in"],
+  ["someone", "some"],
+] as const) {
+  test(`チェック C：${surface} → ${lemma}（en）は、別の語なので疑う`, () => {
+    assert.equal(suspiciousPairs("en", surface, lemma).length, 1);
+  });
+}
+
+for (const [surface, lemma] of [
+  ["makes", "make"],
+  ["watched", "watch"],
+  ["going", "go"],
+  ["stopped", "stop"],
+  ["bigger", "big"],
+  ["really", "real"],
+  ["taken", "take"],
+  ["cannot", "can"],
+  ["done", "do"],
+  ["gone", "go"],
+  ["children", "child"],
+  ["an", "a"],
+] as const) {
+  test(`チェック C：${surface} → ${lemma}（en）は、語形変化なので疑わない`, () => {
+    assert.deepEqual(suspiciousPairs("en", surface, lemma), []);
+  });
+}
