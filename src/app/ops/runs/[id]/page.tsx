@@ -240,6 +240,7 @@ function StepBody({ step, run }: { step: RunStep; run: VocabUpdateRun }) {
           <thead>
             <tr>
               <th>判定</th>
+              <th>原文</th>
               <th>今の手札語彙文</th>
               <th>提案語彙文（更新案を反映した手札語彙）</th>
             </tr>
@@ -256,6 +257,7 @@ function StepBody({ step, run }: { step: RunStep; run: VocabUpdateRun }) {
                     </StatusBadge>
                   )}
                 </td>
+                <td>{validation.message}</td>
                 <td>
                   {validation.currentSetSentence}
                   {validation.currentSetReused && <span className={styles.muted}>（使い回し）</span>}

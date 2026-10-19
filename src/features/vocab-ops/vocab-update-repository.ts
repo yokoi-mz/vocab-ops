@@ -312,6 +312,7 @@ export function listCandidates(db: DatabaseSync, vocabUpdateIds: number[]): Cand
 
 const validationRowSchema = z.object({
   vocab_update_id: z.number(),
+  message: z.string(),
   current_set_sentence: z.string(),
   current_set_reused: z.number(),
   proposed_set_sentence: z.string(),
@@ -320,6 +321,8 @@ const validationRowSchema = z.object({
 
 export type ValidationRecord = {
   vocabUpdateId: number;
+  // 検証に使った履歴の原文（言いたいこと）
+  message: string;
   currentSetSentence: string;
   currentSetReused: boolean;
   proposedSetSentence: string;
@@ -332,16 +335,18 @@ export function listValidations(db: DatabaseSync, vocabUpdateIds: number[]): Val
   }
   return db
     .prepare(`
-      SELECT vocab_update_id, current_set_sentence, current_set_reused, proposed_set_sentence, judgement
-      FROM vocab_update_validations
-      WHERE vocab_update_id IN (${vocabUpdateIds.map(() => "?").join(", ")})
-      ORDER BY vocab_update_id, id
+      SELECT v.vocab_update_id, g.message, v.current_set_sentence, v.current_set_reused, v.proposed_set_sentence, v.judgement
+      FROM vocab_update_validations v
+      JOIN generations g ON g.id = v.source_generation_id
+      WHERE v.vocab_update_id IN (${vocabUpdateIds.map(() => "?").join(", ")})
+      ORDER BY v.vocab_update_id, v.id
     `)
     .all(...vocabUpdateIds)
     .map((row) => {
       const validation = validationRowSchema.parse(row);
       return {
         vocabUpdateId: validation.vocab_update_id,
+        message: validation.message,
         currentSetSentence: validation.current_set_sentence,
         currentSetReused: validation.current_set_reused === 1,
         proposedSetSentence: validation.proposed_set_sentence,
