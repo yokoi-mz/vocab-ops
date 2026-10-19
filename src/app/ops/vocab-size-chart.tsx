@@ -92,7 +92,13 @@ export function VocabSizeChart({ history, currentSeq, currentSize }: VocabSizeCh
             <circle cx={x(seq)} cy={y(size)} r="5" className={styles.chartPoint}>
               <title>{`版 ${point.version}：${size} 語（文生成 ${seq} 回目${point.version === 1 ? "・ベースライン" : `・＋${point.added} −${point.removed}`}）`}</title>
             </circle>
-            <text x={x(seq)} y={y(size) - 12} className={styles.chartPointLabel} textAnchor="middle">
+            {/* 右端の近くでは、ラベルが切れないように、点の左側に寄せて書く */}
+            <text
+              x={x(seq) > width - padding.right - 80 ? x(seq) + 6 : x(seq)}
+              y={y(size) - 12}
+              className={styles.chartPointLabel}
+              textAnchor={x(seq) > width - padding.right - 80 ? "end" : "middle"}
+            >
               {point.version === 1 ? `${size}` : `${size}（+${point.added}/−${point.removed}）`}
             </text>
           </g>

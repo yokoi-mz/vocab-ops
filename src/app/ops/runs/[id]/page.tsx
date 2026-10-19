@@ -135,7 +135,8 @@ function StepBody({ step, run }: { step: RunStep; run: VocabUpdateRun }) {
     step.messages.length > 0 ? (
       <ul className={styles.stepMessages}>
         {step.messages.map((message, index) => (
-          <li key={index}>{message}</li>
+          // 記録の文は「語彙更新 4：」で始まる（動きの記録の画面で、どの語彙更新か分かるように）。この画面では省く
+          <li key={index}>{message.replace(`語彙更新 ${run.id}：`, "")}</li>
         ))}
       </ul>
     ) : null;

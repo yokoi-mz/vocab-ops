@@ -1,4 +1,6 @@
 .page {
+  position: relative;
+  z-index: 1;
   max-width: 1040px;
   margin: 0 auto;
   padding: 28px 16px 72px;
@@ -16,7 +18,11 @@
 .appName {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.appNameText {
   background: linear-gradient(90deg, var(--color-mint), var(--color-sky) 45%, var(--color-pink));
   -webkit-background-clip: text;
   background-clip: text;
@@ -24,17 +30,27 @@
   font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  text-decoration: none;
 }
 
-.logoMark {
-  display: inline-grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--color-mint), var(--color-pink));
-  box-shadow: 0 0 10px rgb(242 155 216 / 0.3);
-  color: var(--color-background);
-  font-size: 15px;
+/* ロゴは角を丸くして表示する */
+.logo {
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgb(242 155 216 / 0.25);
+}
+
+/* ページの奥のロゴ。画面の右下に固定し、スクロールしても動かない */
+.backdrop {
+  position: fixed;
+  right: -6vw;
+  bottom: -10vh;
+  z-index: 0;
+  width: min(86vw, 1000px);
+  aspect-ratio: 792 / 517;
+  background: linear-gradient(120deg, var(--color-mint), var(--color-sky) 45%, var(--color-pink));
+  -webkit-mask: url("/logo-mark.png") center / contain no-repeat;
+  mask: url("/logo-mark.png") center / contain no-repeat;
+  opacity: 0.07;
+  transform: rotate(-8deg);
+  pointer-events: none;
 }

@@ -545,3 +545,57 @@
   font-size: 11px;
   font-weight: 700;
 }
+
+/* ---- スマホの幅 ---- */
+
+.runName {
+  min-width: 6em;
+}
+
+@media (max-width: 640px) {
+  /* 語彙更新の一覧：開始・所要時間・費用は、語彙更新の画面で見られるので省く */
+  .wideOnly {
+    display: none;
+  }
+
+  /* 動きの記録：1件を2行にする（1行目に時刻・種類・ボタン、2行目に内容） */
+  .logTable,
+  .logTable tbody {
+    display: block;
+  }
+
+  .logTable tr {
+    display: grid;
+    grid-template-areas:
+      "time source action"
+      "message message message";
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 10px 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .logTable td {
+    padding: 0;
+    border-top: none;
+  }
+
+  .logTime {
+    grid-area: time;
+    width: auto;
+  }
+
+  .logSource {
+    grid-area: source;
+  }
+
+  .logMessage {
+    grid-area: message;
+  }
+
+  .logAction {
+    grid-area: action;
+    width: auto;
+  }
+}

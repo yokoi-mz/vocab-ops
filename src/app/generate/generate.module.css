@@ -31,11 +31,20 @@
 .summary {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 8px;
   margin: 28px 4px 12px;
   color: var(--color-text-muted);
   font-size: 14px;
+}
+
+.message {
+  margin: 4px 0 0;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
 }
 
 .cards {

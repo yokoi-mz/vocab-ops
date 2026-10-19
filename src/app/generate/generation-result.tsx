@@ -26,11 +26,15 @@ export function GenerationResult({ generation, languageName, speechLang, voiceNa
   return (
     <div>
       <div className={styles.summary}>
-        <span>
-          {languageName}
-          {showSpeaker ? ` ・ ${generation.speaker === "female" ? "女性形" : "男性形"}` : ""}
-          {generation.situation ? ` ・ ${generation.situation}` : ""} ・ 「{generation.message}」
-        </span>
+        <div>
+          <span>
+            {languageName}
+            {showSpeaker ? ` ・ ${generation.speaker === "female" ? "女性形" : "男性形"}` : ""}
+            {generation.situation ? ` ・ ${generation.situation}` : ""}
+          </span>
+          {/* 言いたいこと（原文）。2つの文と比べる元なので、大きく書く */}
+          <p className={styles.message}>「{generation.message}」</p>
+        </div>
         {generation.costUsd !== null && generation.status === "done" && (
           <span>
             ${generation.costUsd.toFixed(4)}（約 {(generation.costUsd * yenPerUsd).toFixed(1)} 円）

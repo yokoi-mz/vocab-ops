@@ -114,9 +114,9 @@ export default async function OpsOverviewPage({ searchParams }: { searchParams: 
                 <th>状態</th>
                 <th>語彙更新</th>
                 <th>変わった語</th>
-                <th>開始</th>
-                <th>所要時間</th>
-                <th>費用</th>
+                <th className={styles.wideOnly}>開始</th>
+                <th className={styles.wideOnly}>所要時間</th>
+                <th className={styles.wideOnly}>費用</th>
               </tr>
             </thead>
             <tbody>
@@ -125,7 +125,7 @@ export default async function OpsOverviewPage({ searchParams }: { searchParams: 
                   <td>
                     <StatusBadge tone={updateTone(update)}>{updateLabel(update)}</StatusBadge>
                   </td>
-                  <td>
+                  <td className={styles.runName}>
                     <Link href={`/ops/runs/${update.id}`} className={styles.runLink}>
                       #{update.id}
                     </Link>
@@ -134,9 +134,9 @@ export default async function OpsOverviewPage({ searchParams }: { searchParams: 
                   <td>
                     <WordChanges update={update} />
                   </td>
-                  <td className={styles.nowrap}>{formatTime(update.startedAt ?? update.createdAt)}</td>
-                  <td className={styles.nowrap}>{formatDuration(secondsBetween(update.startedAt, update.finishedAt))}</td>
-                  <td className={styles.nowrap}>{update.costUsd === null ? "" : `約 ${(update.costUsd * yenPerUsd).toFixed(1)} 円`}</td>
+                  <td className={`${styles.nowrap} ${styles.wideOnly}`}>{formatTime(update.startedAt ?? update.createdAt)}</td>
+                  <td className={`${styles.nowrap} ${styles.wideOnly}`}>{formatDuration(secondsBetween(update.startedAt, update.finishedAt))}</td>
+                  <td className={`${styles.nowrap} ${styles.wideOnly}`}>{update.costUsd === null ? "" : `約 ${(update.costUsd * yenPerUsd).toFixed(1)} 円`}</td>
                 </tr>
               ))}
             </tbody>

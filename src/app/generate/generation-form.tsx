@@ -158,7 +158,7 @@ export function GenerationForm({ languages, initialGenerationId }: GenerationFor
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             onKeyDown={submitWithShortcut}
-            placeholder="例：昨日、駅で財布をなくしちゃって、本当に困った。"
+            placeholder="例：駅で外国人を助けた。"
           />
         </label>
         <div className={styles.row}>

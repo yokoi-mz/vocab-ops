@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="1200" height="640" font-family="'Hiragino Maru Gothic ProN','Hiragino Sans','Noto Sans JP','Yu Gothic',sans-serif">
+  <rect width="1200" height="640" rx="28" fill="#120e2a"/>
+  <text x="44" y="58" font-size="22" fill="#eeeaff" font-weight="700" text-anchor="start">Ops：あなたの語彙を、使いながら最適化する</text>
+  <g transform="translate(54.0 88.0) scale(1.0)" fill="#f29bd8"><circle cx="0" cy="-4" r="3.6"/><path d="M -6.5 7 Q -6.5 0.5 0 0.5 Q 6.5 0.5 6.5 7 Z"/></g>
+  <text x="70" y="93" font-size="15" fill="#f29bd8" font-weight="700" text-anchor="start">あなた：① 文を作る だけ</text>
+  <g transform="translate(54.0 118.0) scale(1.0)" fill="#93c9e6"><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(0)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(45)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(90)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(135)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(180)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(225)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(270)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(315)"/><circle r="5.4"/><circle r="2.2" fill="#120e2a"/></g>
+  <text x="70" y="123" font-size="15" fill="#93c9e6" font-weight="700" text-anchor="start">自動：②〜⑥ は裏で行われる</text>
+  <ellipse cx="600" cy="340" rx="420" ry="228" fill="none" stroke="#b3a3f0" stroke-opacity="0.45" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>
+  <path d="M -10 -9 L 8 0 L -10 9 z" fill="#b3a3f0" transform="translate(810.0 142.5) rotate(17.4)"/>
+  <path d="M -10 -9 L 8 0 L -10 9 z" fill="#b3a3f0" transform="translate(1020.0 340.0) rotate(90.0)"/>
+  <path d="M -10 -9 L 8 0 L -10 9 z" fill="#b3a3f0" transform="translate(810.0 537.5) rotate(162.6)"/>
+  <path d="M -10 -9 L 8 0 L -10 9 z" fill="#b3a3f0" transform="translate(390.0 537.5) rotate(-162.6)"/>
+  <path d="M -10 -9 L 8 0 L -10 9 z" fill="#b3a3f0" transform="translate(180.0 340.0) rotate(-90.0)"/>
+  <path d="M -10 -9 L 8 0 L -10 9 z" fill="#b3a3f0" transform="translate(390.0 142.5) rotate(-17.4)"/>
+  <rect x="430.0" y="265.0" width="340" height="158" rx="20" fill="#e8d48a" fill-opacity="0.08" stroke="#e8d48a" stroke-width="2"/>
+  <rect x="497" y="283.0" width="14" height="20" rx="3" fill="#120e2a" stroke="#e8d48a" stroke-width="1.6" transform="rotate(-14 504 303.0)"/>
+  <rect x="497" y="283.0" width="14" height="20" rx="3" fill="#120e2a" stroke="#e8d48a" stroke-width="1.6" transform="rotate(0 504 303.0)"/>
+  <rect x="497" y="283.0" width="14" height="20" rx="3" fill="#120e2a" stroke="#e8d48a" stroke-width="1.6" transform="rotate(14 504 303.0)"/>
+  <text x="612" y="305.0" font-size="20" fill="#e8d48a" font-weight="700" text-anchor="middle">あなたの語彙</text>
+  <g transform="translate(483.4 343.0) rotate(0)">
+    <rect x="-20.2" y="-14" width="40.4" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-20.2" y="-14" width="40.4" height="28" rx="14" fill="#a69fd0" fill-opacity="0.1" stroke="#a69fd0" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="14" fill="#a69fd0" font-weight="700" text-anchor="middle">go</text>
+  </g>
+  <g transform="translate(537.9 343.0) rotate(0)">
+    <rect x="-24.3" y="-14" width="48.6" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-24.3" y="-14" width="48.6" height="28" rx="14" fill="#a69fd0" fill-opacity="0.1" stroke="#a69fd0" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="14" fill="#a69fd0" font-weight="700" text-anchor="middle">eat</text>
+  </g>
+  <g transform="translate(608.8 343.0) rotate(0)">
+    <rect x="-36.6" y="-14" width="73.2" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-36.6" y="-14" width="73.2" height="28" rx="14" fill="#a69fd0" fill-opacity="0.1" stroke="#a69fd0" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="14" fill="#a69fd0" font-weight="700" text-anchor="middle">friend</text>
+  </g>
+  <g transform="translate(696.1 343.0) rotate(0)">
+    <rect x="-40.7" y="-14" width="81.4" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-40.7" y="-14" width="81.4" height="28" rx="14" fill="#a69fd0" fill-opacity="0.1" stroke="#a69fd0" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="14" fill="#a69fd0" font-weight="700" text-anchor="middle">station</text>
+  </g>
+  <g transform="translate(495.7 381.0) rotate(0)">
+    <rect x="-28.4" y="-14" width="56.8" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-28.4" y="-14" width="56.8" height="28" rx="14" fill="#a69fd0" fill-opacity="0.1" stroke="#a69fd0" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="14" fill="#a69fd0" font-weight="700" text-anchor="middle">good</text>
+  </g>
+  <g transform="translate(562.5 381.0) rotate(0)">
+    <rect x="-28.4" y="-14" width="56.8" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-28.4" y="-14" width="56.8" height="28" rx="14" fill="#a69fd0" fill-opacity="0.1" stroke="#a69fd0" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="14" fill="#a69fd0" font-weight="700" text-anchor="middle">time</text>
+  </g>
+  <g transform="translate(629.3 381.0) rotate(0)">
+    <rect x="-28.4" y="-14" width="56.8" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-28.4" y="-14" width="56.8" height="28" rx="14" fill="#a69fd0" fill-opacity="0.1" stroke="#a69fd0" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="14" fill="#a69fd0" font-weight="700" text-anchor="middle">home</text>
+  </g>
+  <g transform="translate(700.2 381.0) rotate(0)">
+    <rect x="-32.5" y="-14" width="65.0" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-32.5" y="-14" width="65.0" height="28" rx="14" fill="#a69fd0" fill-opacity="0.1" stroke="#a69fd0" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="14" fill="#a69fd0" font-weight="700" text-anchor="middle">happy</text>
+  </g>
+  <g transform="translate(538.0 263.0) rotate(-7)">
+    <rect x="-40.5" y="-14" width="81.0" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-40.5" y="-14" width="81.0" height="28" rx="14" fill="#8fe39b" fill-opacity="0.18" stroke="#8fe39b" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="-25.5" y="5" font-size="16" fill="#8fe39b" font-weight="700" text-anchor="middle">+</text>
+    <text x="8.0" y="5" font-size="14" fill="#8fe39b" font-weight="700" text-anchor="middle">dance</text>
+  </g>
+  <g transform="translate(662.0 261.0) rotate(6)">
+    <rect x="-40.5" y="-14" width="81.0" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-40.5" y="-14" width="81.0" height="28" rx="14" fill="#8fe39b" fill-opacity="0.18" stroke="#8fe39b" stroke-opacity="0.85" stroke-width="1.5"/>
+    <text x="-25.5" y="5" font-size="16" fill="#8fe39b" font-weight="700" text-anchor="middle">+</text>
+    <text x="8.0" y="5" font-size="14" fill="#8fe39b" font-weight="700" text-anchor="middle">shout</text>
+  </g>
+  <text x="600" y="235.0" font-size="14" fill="#8fe39b" font-weight="700" text-anchor="middle">足す語</text>
+  <g transform="translate(538.0 429.0) rotate(8)" opacity="0.7">
+    <rect x="-40.5" y="-14" width="81.0" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-40.5" y="-14" width="81.0" height="28" rx="14" fill="#ff8f8f" fill-opacity="0.06" stroke="#ff8f8f" stroke-opacity="0.85" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="-25.5" y="5" font-size="16" fill="#ff8f8f" font-weight="700" text-anchor="middle">×</text>
+    <text x="8.0" y="5" font-size="14" fill="#ff8f8f" font-weight="700" text-anchor="middle">quiet</text>
+  </g>
+  <g transform="translate(662.0 431.0) rotate(-6)" opacity="0.7">
+    <rect x="-40.5" y="-14" width="81.0" height="28" rx="14" fill="#120e2a"/>
+    <rect x="-40.5" y="-14" width="81.0" height="28" rx="14" fill="#ff8f8f" fill-opacity="0.06" stroke="#ff8f8f" stroke-opacity="0.85" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="-25.5" y="5" font-size="16" fill="#ff8f8f" font-weight="700" text-anchor="middle">×</text>
+    <text x="8.0" y="5" font-size="14" fill="#ff8f8f" font-weight="700" text-anchor="middle">relax</text>
+  </g>
+  <text x="600" y="467.0" font-size="14" fill="#ff8f8f" font-weight="700" text-anchor="middle">外す語</text>
+  <rect x="465.0" y="70.0" width="270" height="84" rx="18" fill="#120e2a" stroke="#f29bd8" stroke-width="2"/>
+  <rect x="465.0" y="70.0" width="270" height="84" rx="18" fill="#f29bd8" fill-opacity="0.08"/>
+  <rect x="558.0" y="57.0" width="84" height="26" rx="13" fill="#120e2a" stroke="#f29bd8" stroke-width="1.5"/>
+  <g transform="translate(575.0 70.0) scale(0.95)" fill="#f29bd8"><circle cx="0" cy="-4" r="3.6"/><path d="M -6.5 7 Q -6.5 0.5 0 0.5 Q 6.5 0.5 6.5 7 Z"/></g>
+  <text x="609.0" y="75.0" font-size="13" fill="#f29bd8" font-weight="700" text-anchor="middle">あなた</text>
+  <text x="600.0" y="106.0" font-size="20" fill="#f29bd8" font-weight="700" text-anchor="middle">① 文を作る</text>
+  <text x="600.0" y="134.0" font-size="15" fill="#a69fd0" font-weight="400" text-anchor="middle">言いたいことを、あなたの語彙で</text>
+  <rect x="828.7" y="184.0" width="270" height="84" rx="18" fill="#120e2a" stroke="#93c9e6" stroke-width="2"/>
+  <rect x="828.7" y="184.0" width="270" height="84" rx="18" fill="#93c9e6" fill-opacity="0.08"/>
+  <rect x="921.7" y="171.0" width="84" height="26" rx="13" fill="#120e2a" stroke="#93c9e6" stroke-width="1.5"/>
+  <g transform="translate(938.7 184.0) scale(0.95)" fill="#93c9e6"><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(0)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(45)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(90)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(135)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(180)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(225)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(270)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(315)"/><circle r="5.4"/><circle r="2.2" fill="#120e2a"/></g>
+  <text x="972.7" y="189.0" font-size="13" fill="#93c9e6" font-weight="700" text-anchor="middle">自動</text>
+  <text x="963.7" y="220.0" font-size="20" fill="#93c9e6" font-weight="700" text-anchor="middle">② 記録がたまる</text>
+  <text x="963.7" y="248.0" font-size="15" fill="#a69fd0" font-weight="400" text-anchor="middle">30 回ごとに見直す</text>
+  <rect x="828.7" y="412.0" width="270" height="84" rx="18" fill="#120e2a" stroke="#93c9e6" stroke-width="2"/>
+  <rect x="828.7" y="412.0" width="270" height="84" rx="18" fill="#93c9e6" fill-opacity="0.08"/>
+  <rect x="921.7" y="399.0" width="84" height="26" rx="13" fill="#120e2a" stroke="#93c9e6" stroke-width="1.5"/>
+  <g transform="translate(938.7 412.0) scale(0.95)" fill="#93c9e6"><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(0)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(45)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(90)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(135)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(180)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(225)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(270)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(315)"/><circle r="5.4"/><circle r="2.2" fill="#120e2a"/></g>
+  <text x="972.7" y="417.0" font-size="13" fill="#93c9e6" font-weight="700" text-anchor="middle">自動</text>
+  <text x="963.7" y="448.0" font-size="20" fill="#93c9e6" font-weight="700" text-anchor="middle">③ 分析する</text>
+  <text x="963.7" y="476.0" font-size="15" fill="#a69fd0" font-weight="400" text-anchor="middle">よく足された語・使われない語</text>
+  <rect x="465.0" y="526.0" width="270" height="84" rx="18" fill="#120e2a" stroke="#93c9e6" stroke-width="2"/>
+  <rect x="465.0" y="526.0" width="270" height="84" rx="18" fill="#93c9e6" fill-opacity="0.08"/>
+  <rect x="558.0" y="513.0" width="84" height="26" rx="13" fill="#120e2a" stroke="#93c9e6" stroke-width="1.5"/>
+  <g transform="translate(575.0 526.0) scale(0.95)" fill="#93c9e6"><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(0)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(45)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(90)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(135)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(180)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(225)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(270)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(315)"/><circle r="5.4"/><circle r="2.2" fill="#120e2a"/></g>
+  <text x="609.0" y="531.0" font-size="13" fill="#93c9e6" font-weight="700" text-anchor="middle">自動</text>
+  <text x="600.0" y="562.0" font-size="20" fill="#93c9e6" font-weight="700" text-anchor="middle">④ 更新案を作る</text>
+  <text x="600.0" y="590.0" font-size="15" fill="#a69fd0" font-weight="400" text-anchor="middle">足す語・外す語を選ぶ</text>
+  <rect x="101.3" y="412.0" width="270" height="84" rx="18" fill="#120e2a" stroke="#93c9e6" stroke-width="2"/>
+  <rect x="101.3" y="412.0" width="270" height="84" rx="18" fill="#93c9e6" fill-opacity="0.08"/>
+  <rect x="194.3" y="399.0" width="84" height="26" rx="13" fill="#120e2a" stroke="#93c9e6" stroke-width="1.5"/>
+  <g transform="translate(211.3 412.0) scale(0.95)" fill="#93c9e6"><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(0)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(45)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(90)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(135)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(180)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(225)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(270)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(315)"/><circle r="5.4"/><circle r="2.2" fill="#120e2a"/></g>
+  <text x="245.3" y="417.0" font-size="13" fill="#93c9e6" font-weight="700" text-anchor="middle">自動</text>
+  <text x="236.3" y="448.0" font-size="20" fill="#93c9e6" font-weight="700" text-anchor="middle">⑤ 確かめる</text>
+  <text x="236.3" y="476.0" font-size="15" fill="#a69fd0" font-weight="400" text-anchor="middle">前と後で文を作り比べる</text>
+  <rect x="101.3" y="184.0" width="270" height="84" rx="18" fill="#120e2a" stroke="#93c9e6" stroke-width="2"/>
+  <rect x="101.3" y="184.0" width="270" height="84" rx="18" fill="#93c9e6" fill-opacity="0.08"/>
+  <rect x="194.3" y="171.0" width="84" height="26" rx="13" fill="#120e2a" stroke="#93c9e6" stroke-width="1.5"/>
+  <g transform="translate(211.3 184.0) scale(0.95)" fill="#93c9e6"><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(0)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(45)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(90)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(135)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(180)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(225)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(270)"/><rect x="-1.8" y="-8" width="3.6" height="4" rx="0.8" transform="rotate(315)"/><circle r="5.4"/><circle r="2.2" fill="#120e2a"/></g>
+  <text x="245.3" y="189.0" font-size="13" fill="#93c9e6" font-weight="700" text-anchor="middle">自動</text>
+  <text x="236.3" y="220.0" font-size="20" fill="#93c9e6" font-weight="700" text-anchor="middle">⑥ 反映する</text>
+  <text x="236.3" y="248.0" font-size="15" fill="#a69fd0" font-weight="400" text-anchor="middle">合格したら語彙を更新</text>
+</svg>

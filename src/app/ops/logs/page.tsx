@@ -59,10 +59,10 @@ export default async function OpsLogsPage({ searchParams }: { searchParams: Prom
               {events.map((event) => (
                 <tr key={event.id}>
                   <td className={styles.logTime}>{formatTime(event.createdAt)}</td>
-                  <td>
+                  <td className={styles.logSource}>
                     <span className={`${styles.source} ${styles[`source_${event.source}`]}`}>{sourceLabels[event.source]}</span>
                   </td>
-                  <td>{event.message}</td>
+                  <td className={styles.logMessage}>{event.message}</td>
                   <td className={styles.logAction}>
                     {event.source === "vocab_update" && event.referenceId !== null && (
                       <Link href={`/ops/runs/${event.referenceId}`} className={styles.actionLink}>
